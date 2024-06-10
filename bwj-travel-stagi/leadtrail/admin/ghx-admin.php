@@ -250,6 +250,7 @@ class GHAX_Leadtrail_Admin
     $tblgrps = $wpdb->prefix . 'ghaxlt_lead_groups';
     $tblqlty = $wpdb->prefix . 'ghaxlt_lead_qualities';
     $tblpymts = $wpdb->prefix . 'ghaxlt_leads_payments';
+    $tblrole = $wpdb->prefix . 'ghaxlt_lead_roles';
     //include("./include_once.php");
   ?>
 
@@ -841,6 +842,13 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
     $cat_lead_field_display = get_option('cat_lead_field_display');
     $group_lead_field_display = get_option('group_lead_field_display');
     $quality_lead_field_display = get_option('quality_lead_field_display');
+    $daily_limit_annual = get_option('daily_limit_annual');
+    $monthly_limit_annual = get_option('monthly_limit_annual');
+    $yearly_limit_annual = get_option('yearly_limit_annual');
+    $daily_limit_monthly = get_option('daily_limit_monthly');
+    $monthly_limit_monthly = get_option('monthly_limit_monthly');
+    $yearly_limit_monthly = get_option('yearly_limit_monthly');
+
 
     if ($admin_lead_field_display) {
     } else {
@@ -1215,6 +1223,87 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
               </div>
             </div>
           </div>
+      </div>
+
+      <div class="settingcontainer custom-build buyer-details">
+        <h2>Buyer Details</h2>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>User role</label>
+                <div class="form-class">
+                  <select name="paypal_mode">
+                    <option value="">-SELECT-</option>
+                    <option value="leadtrail-buyer" selected>Annual Lead Buyer</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Daily limit</label>
+                <div class="form-class">
+                  <input type="text" name="daily_limit_annual" value="<?php echo esc_attr($daily_limit_annual); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Monthly limit</label>
+                <div class="form-class">
+                  <input type="text" name="monthly_limit_annual" value="<?php echo esc_attr($monthly_limit_annual); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Yearly limit</label>
+                <div class="form-class">
+                  <input type="text" name="yearly_limit_annual" value="<?php echo esc_attr($yearly_limit_annual); ?>">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>User role</label>
+                <div class="form-class">
+                  <select name="paypal_mode">
+                    <option value="">-SELECT-</option>
+                    <option value="leadtrail-buyer" selected>Monthly Lead Buyer</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Daily limit</label>
+                <div class="form-class">
+                  <input type="text" name="daily_limit_monthly" value="<?php echo esc_attr($daily_limit_monthly); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Monthly limit</label>
+                <div class="form-class">
+                  <input type="text" name="monthly_limit_monthly" value="<?php echo esc_attr($monthly_limit_monthly); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Yearly limit</label>
+                <div class="form-class">
+                  <input type="text" name="yearly_limit_monthly" value="<?php echo esc_attr($yearly_limit_monthly); ?>">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="settingcontainer custom-build payment-details">

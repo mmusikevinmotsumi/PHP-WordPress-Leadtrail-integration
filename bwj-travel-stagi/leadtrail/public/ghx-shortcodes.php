@@ -38,7 +38,7 @@ class GHAX_Shortcode_Manager
     $buy_lead_page = get_option('buy_lead_page');
 
     $user = wp_get_current_user();
-    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
 
       echo '<p>You are not allowed to view this content.</p>';
     } else {
@@ -101,8 +101,8 @@ class GHAX_Shortcode_Manager
 
                         <label>Price:</label>
 
-                        <div slider id="slider-distance">
-                          <div>
+                        <!-- <div slider id="slider-distance">
+                          <div >
                             <div inverse-left style="width:70%;"></div>
                             <div inverse-right style="width:70%;"></div>
                             <div range style="left:0%;right:0%;"></div>
@@ -132,7 +132,40 @@ class GHAX_Shortcode_Manager
 	                                      children[5].style.right=(100-value)+'%';
 	                                      children[9].style.left=value+'%';children[13].style.left=value+'%';
 	                                      children[13].childNodes[1].innerHTML=this.value;" />
+                        </div> -->
+                        <div slider id="slider-distance">
+                          <div class="filter_sets">
+                            <div inverse-left style="width:70%;"></div>
+                            <div inverse-right style="width:70%;"></div>
+                            <div range style="left:0%;right:0%;"></div>
+                            <span thumb style="left:0%;"></span>
+                            <span thumb style="left:100%;"></span>
+                            <div sign style="left:0%;">
+                              <span id="value">0</span>
+                            </div>
+                            <div sign style="left:100%;">
+                              <span id="value"><?php echo esc_html($price_result[0]->max_price) ?></span>
+                            </div>
+                          </div>
+                          <input id="pricemin" type="range" tabindex="0" value="0" max="<?php echo $price_result[0]->max_price ?>" min="0" step="1" oninput="
+                                            this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
+                                            var value=(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.value)-(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.min);
+                                            var children = this.parentNode.childNodes[1].childNodes;
+                                            children[1].style.width=value+'%';
+                                            children[5].style.left=value+'%';
+                                            children[7].style.left=value+'%';children[11].style.left=value+'%';
+                                            children[11].childNodes[1].innerHTML=this.value;" />
+
+                          <input id="pricemax" type="range" tabindex="0" value="<?php echo $price_result[0]->max_price ?>" max="<?php echo $price_result[0]->max_price ?>" min="0" step="1" oninput="
+                                            this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
+                                            var value=(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.value)-(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.min);
+                                            var children = this.parentNode.childNodes[1].childNodes;
+                                            children[3].style.width=(100-value)+'%';
+                                            children[5].style.right=(100-value)+'%';
+                                            children[9].style.left=value+'%';children[13].style.left=value+'%';
+                                            children[13].childNodes[1].innerHTML=this.value;" />
                         </div>
+                        <button class="btn btn-primary Reset_button" id="resetBtn">Reset</button>
                       </div>
                     </div>
                   <?php } ?>

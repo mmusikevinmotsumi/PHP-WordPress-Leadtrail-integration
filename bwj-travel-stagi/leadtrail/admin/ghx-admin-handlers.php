@@ -301,6 +301,12 @@ class GHAX_Leadtrail_Handlers
       $_leadbuyerdashboard_page = sanitize_text_field($_POST['_leadbuyerdashboard_page']);
       $_leaddisplayall_page = sanitize_text_field($_POST['_leaddisplayall_page']);
       $max_lead_purchase = sanitize_text_field($_POST['max_lead_purchase']);
+      $daily_limit_annual = sanitize_text_field($_POST['daily_limit_annual']);
+      $monthly_limit_annual = sanitize_text_field($_POST['monthly_limit_annual']);
+      $yearly_limit_annual = sanitize_text_field($_POST['yearly_limit_annual']);
+      $daily_limit_monthly = sanitize_text_field($_POST['daily_limit_monthly']);
+      $monthly_limit_monthly = sanitize_text_field($_POST['monthly_limit_monthly']);
+      $yearly_limit_monthly = sanitize_text_field($_POST['yearly_limit_monthly']);
 
       if (isset($_POST['admin_lead_field_display']) && ($_POST['admin_lead_field_display'])) {
         $admin_lead_field_display = array_map('sanitize_text_field', $_POST['admin_lead_field_display']);
@@ -353,6 +359,12 @@ class GHAX_Leadtrail_Handlers
       update_option('cat_lead_field_display', $cat_lead_field_display);
       update_option('group_lead_field_display', $group_lead_field_display);
       update_option('quality_lead_field_display', $quality_lead_field_display);
+      update_option('daily_limit_annual', $daily_limit_annual);
+      update_option('monthly_limit_annual', $monthly_limit_annual);
+      update_option('yearly_limit_annual', $yearly_limit_annual);
+      update_option('daily_limit_monthly', $daily_limit_monthly);
+      update_option('monthly_limit_monthly', $monthly_limit_monthly);
+      update_option('yearly_limit_monthly', $yearly_limit_monthly);
 
       GHAX_Traits::leadtrail_success('Settings Update');
     }

@@ -79,6 +79,8 @@ class GHAX_Leadtrail_Public
   {
     if (get_option('GHAXlt_custom_roles_version') < 1) {
       add_role('ghaxlt_buyer', 'Leadtrail Buyer', array('read' => true, 'level_0' => true));
+      add_role('ghaxlt_annual_buyer', 'Annual Lead Buyer', array('read' => true, 'level_0' => true));
+      add_role('ghaxlt_monthly_buyer', 'Monthly Lead Buyer', array('read' => true, 'level_0' => true));
       update_option('GHAXlt_custom_roles_version', 1);
     }
   }

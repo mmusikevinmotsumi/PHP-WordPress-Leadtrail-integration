@@ -119,6 +119,20 @@ class leadtrail_Activator
 					) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
     $wpdb->query($sqlQuery3);
 
+    /*** creating buyer roles table */
+
+    // $sqlQuery5 = "CREATE TABLE IF NOT EXISTS `" . $wpdb->prefix . "ghaxlt_lead_roles` (
+    //       `id` int(11) NOT NULL AUTO_INCREMENT,
+    //       `name` longtext DEFAULT NULL,
+    //       `image` varchar(255) DEFAULT NULL,
+    //       `type` varchar(255) DEFAULT NULL,
+    //       `created_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    //       `daily_limit` int(11) DEFAULT NULL,
+    //       `monthly_limit` int(11) DEFAULT NULL,
+    //       `yearly_limit` int(11) DEFAULT NULL,
+    //       PRIMARY KEY (`id`)
+    //       ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;";
+    // $wpdb->query($sqlQuery5);
 
     /* Adding lead detail page*/
     $leaddetail_not_exist = $leadpurchase_not_exist = $leadbuyerdashboard_not_exist = $leaddisplayall_not_exist = 0;
