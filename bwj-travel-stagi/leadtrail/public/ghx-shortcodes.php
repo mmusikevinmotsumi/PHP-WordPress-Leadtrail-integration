@@ -36,6 +36,7 @@ class GHAX_Shortcode_Manager
     global $wpdb;
 
     $buy_lead_page = get_option('buy_lead_page');
+    $buyer_dashboard_page = get_permalink(get_option('_leadbuyerdashboard_page'));
 
     $user = wp_get_current_user();
     if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
@@ -57,132 +58,6 @@ class GHAX_Shortcode_Manager
         <div class="container">
           <div class="leadssrt">
             <h2>Displaying Leads by All</h2>
-            <div class="filter-holder">
-              <div class="filter-left-wrap">
-                <div class="row">
-                  <?php
-
-                  $countries = file_get_contents(GHAX_LEADTRAIL_ABSPATH . 'includes/classes/json/countries.json');
-
-                  $array_countries = json_decode($countries, true);
-                  $option = "<option value=''>Please select the country</option>";
-                  foreach ($array_countries as $array_country) {
-                    $option .= "<option value='" . esc_attr($array_country['iso2']) . "'>" . esc_html($array_country['name']) . "</option>";
-                  }  ?>
-                  <div class="col-md-4">
-                    <div class="form-holder">
-                      <label>Country:</label>
-                      <select name="country" id="country" data-column="7" onchange="leadsearch()" class="custom-input"><?php echo $option; ?></select>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-holder select-state-text">
-                      <label>State:</label>
-                      <input type="text" name="state" id="state" data-column="8" onkeyup="leadsearch()" placeholder="State" class="custom-input">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-holder">
-                      <label>City:</label>
-                      <input type="text" name="city" id="city" data-column="9" onkeyup="leadsearch()" placeholder="City" class="custom-input">
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-holder">
-                      <label>Enter Zip </label>
-                      <input type="text" name="zipcode" id="zipcode" data-column="10" onkeyup="leadsearch()" class="custom-input" placeholder="zip">
-                    </div>
-                  </div>
-
-                  <?php
-                  if (count($price_result) > 0 && $price_result[0]->max_price > 0) { ?>
-                    <div class="col-md-4">
-                      <div class="form-holder">
-
-                        <label>Price:</label>
-
-                        <!-- <div slider id="slider-distance">
-                          <div >
-                            <div inverse-left style="width:70%;"></div>
-                            <div inverse-right style="width:70%;"></div>
-                            <div range style="left:0%;right:0%;"></div>
-                            <span thumb style="left:0%;"></span>
-                            <span thumb style="left:100%;"></span>
-                            <div sign style="left:0%;">
-                              <span id="value"><?php echo 0; ?></span>
-                            </div>
-                            <div sign style="left:100%;">
-                              <span id="value"><?php echo esc_html($price_result[0]->max_price); ?></span>
-                            </div>
-                          </div>
-                          <input type="range" tabindex="0" onchange="leadsearch()" id="min_price" value="0" max="<?php echo esc_attr($price_result[0]->max_price); ?>" min="0" step="1" oninput="
-	                                      this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
-	                                      var value=(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.value)-(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.min);
-	                                      var children = this.parentNode.childNodes[1].childNodes;
-	                                      children[1].style.width=value+'%';
-	                                      children[5].style.left=value+'%';
-	                                      children[7].style.left=value+'%';children[11].style.left=value+'%';
-	                                      children[11].childNodes[1].innerHTML=this.value;" />
-
-                          <input type="range" tabindex="0" onchange="leadsearch()" id="max_price" value="<?php echo $price_result[0]->max_price; ?>" max="<?php echo $price_result[0]->max_price; ?>" min="0" step="1" oninput="
-	                                      this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
-	                                      var value=(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.value)-(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.min);
-	                                      var children = this.parentNode.childNodes[1].childNodes;
-	                                      children[3].style.width=(100-value)+'%';
-	                                      children[5].style.right=(100-value)+'%';
-	                                      children[9].style.left=value+'%';children[13].style.left=value+'%';
-	                                      children[13].childNodes[1].innerHTML=this.value;" />
-                        </div> -->
-                        <div slider id="slider-distance">
-                          <div class="filter_sets">
-                            <div inverse-left style="width:70%;"></div>
-                            <div inverse-right style="width:70%;"></div>
-                            <div range style="left:0%;right:0%;"></div>
-                            <span thumb style="left:0%;"></span>
-                            <span thumb style="left:100%;"></span>
-                            <div sign style="left:0%;">
-                              <span id="value">0</span>
-                            </div>
-                            <div sign style="left:100%;">
-                              <span id="value"><?php echo esc_html($price_result[0]->max_price) ?></span>
-                            </div>
-                          </div>
-                          <input id="pricemin" type="range" tabindex="0" value="0" max="<?php echo $price_result[0]->max_price ?>" min="0" step="1" oninput="
-                                            this.value=Math.min(this.value,this.parentNode.childNodes[5].value-1);
-                                            var value=(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.value)-(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.min);
-                                            var children = this.parentNode.childNodes[1].childNodes;
-                                            children[1].style.width=value+'%';
-                                            children[5].style.left=value+'%';
-                                            children[7].style.left=value+'%';children[11].style.left=value+'%';
-                                            children[11].childNodes[1].innerHTML=this.value;" />
-
-                          <input id="pricemax" type="range" tabindex="0" value="<?php echo $price_result[0]->max_price ?>" max="<?php echo $price_result[0]->max_price ?>" min="0" step="1" oninput="
-                                            this.value=Math.max(this.value,this.parentNode.childNodes[3].value-(-1));
-                                            var value=(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.value)-(100/(parseInt(this.max)-parseInt(this.min)))*parseInt(this.min);
-                                            var children = this.parentNode.childNodes[1].childNodes;
-                                            children[3].style.width=(100-value)+'%';
-                                            children[5].style.right=(100-value)+'%';
-                                            children[9].style.left=value+'%';children[13].style.left=value+'%';
-                                            children[13].childNodes[1].innerHTML=this.value;" />
-                        </div>
-                        <button class="btn btn-primary Reset_button" id="resetBtn">Reset</button>
-                      </div>
-                    </div>
-                  <?php } ?>
-                  <?php $multiple_lead = get_option('multiple_lead_show', false);
-                  if ($multiple_lead) { ?>
-                    <div class="col-md-4">
-                      <div class="form-holder">
-                        <div class="cart-btn-top">
-                          <a class="buyleadbtn" href="<?php echo get_permalink($buy_lead_page); ?>">View Cart</a>
-                        </div>
-                      </div>
-                    </div>
-                  <?php } ?>
-                </div>
-              </div>
-            </div>
-
             <?php $lead_field_display = get_option('lead_field_display');
             if ($lead_field_display) {
             } else {
@@ -190,6 +65,25 @@ class GHAX_Shortcode_Manager
             }  ?>
             <?php
             $style = 'style="display:none"'; ?>
+            <?php 
+                $multiple_lead = get_option('multiple_lead_show', false);
+                                       
+                if ($multiple_lead) { ?>
+                  <div class="lead-main-wrap" style="display:none;">
+                    <div class="top-hdr-info">
+                      <p style="font-weight:bold;;">You are requesting access to the following lead:</p>
+                      <ul>                        
+                      </ul>
+                    </div>
+                    <div class="float-end text-end mt-4 mb-4">
+                      <div class="form-holder">
+                        <div class="cart-btn-top">
+                          <a class="buyleadbtn confirmaddtocart"  href="javascript:void(0)">Confirm</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <?php } ?>
             <table id="leadstbl" style="width:100%;" class="table table-bordered">
               <thead>
                 <th <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Email</th>
@@ -244,7 +138,7 @@ class GHAX_Shortcode_Manager
                   $price = $result->totalprice;
                 ?>
 
-                  <tr id="delete_<?php echo esc_attr($result->id); ?>">
+                  <tr id="delete_<?php echo esc_attr($result->id); ?>" email="<?php echo ghax_obfuscate_email($myemail);?>">
                     <td <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ghax_obfuscate_email($myemail); ?></td>
                     <td <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->form_name) ? esc_html($result->form_name) : 'N/A'; ?></td>
                     <td <?php echo (in_array('purchased_count', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($result->buylead . '/' . $result->new_lead_quantity); ?></td>
@@ -297,18 +191,21 @@ class GHAX_Shortcode_Manager
                     if ($multiple_lead) {
                       if ($leadcart) {
                         if (in_array($result->id, $leadcart)) { ?>
-                          <td><a class="added buyleadbtn" href="javascript:void(0)">Added</a> <a class="remove_cart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Remove</a></td>
+                          <td>
+                            <!-- <a class="added buyleadbtn" href="javascript:void(0)">Confirm</a>  -->
+                            <a class="added remove_cart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Remove</a>
+                          </td>
                         <?php
                         } else { ?>
-                          <td><a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Add to Cart</a> </td>
+                          <td><a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a> </td>
                         <?php
                         } ?>
                       <?php } else { ?>
-                        <td><a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Add to Cart</a> </td>
+                        <td><a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a> </td>
                       <?php
                       }
                     } else { ?>
-                      <td><a class="directbuy buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Buy Lead</a></td>
+                      <td><a class="directbuy buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a></td>
                     <?php } ?>
 
                   </tr>
@@ -319,6 +216,21 @@ class GHAX_Shortcode_Manager
             </table>
           </div>
         </div>
+        <script>
+          jQuery("a.added").parents("tr").addClass("added");
+
+          jQuery(".lead-main-wrap .top-hdr-info ul li").remove();
+
+          if (jQuery("a.added").length>0){
+            jQuery(".lead-main-wrap").show();
+          }
+          else{
+            jQuery(".lead-main-wrap").hide();
+          }
+          jQuery("a.added").each(function(){
+            jQuery(".lead-main-wrap .top-hdr-info ul").append("<li>" + jQuery(this).parents("tr").attr("email") + "</li>")
+          })
+        </script>
       <?php
       } else {
         echo '<p>No leads found.</p>';
@@ -335,7 +247,7 @@ class GHAX_Shortcode_Manager
 
     $buy_lead_page = get_option('buy_lead_page');
     $user = wp_get_current_user();
-    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
       echo '<p>You are not allowed to view this content.</p>';
     } else {
       $q1 = "SELECT * FROM {$wpdb->prefix}ghaxlt_lead_cats WHERE id=" . $atts['category'];
@@ -590,7 +502,7 @@ class GHAX_Shortcode_Manager
 
     $buy_lead_page = get_option('buy_lead_page');
     $user = wp_get_current_user();
-    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
       echo '<p>You are not allowed to view this content.</p>';
     } else {
 
@@ -848,7 +760,7 @@ class GHAX_Shortcode_Manager
 
     $buy_lead_page = get_option('buy_lead_page');
     $user = wp_get_current_user();
-    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
 
       echo '<p>You are not allowed to view this content.</p>';
     } else {
@@ -1264,7 +1176,7 @@ class GHAX_Shortcode_Manager
       }
       $lprice = array_sum($price);
 
-      echo '<div class="lead-main-wrap"><div class="top-hdr-info"><p style="font-weight:bold;;">You are purchasing the following leads:</p>';
+      echo '<div class="lead-main-wrap"><div class="top-hdr-info"><p style="font-weight:bold;;">You are requesting access to the following lead:</p>';
       echo "<ul><li>" . implode("</li><li>", $lead_email) . "</li></ul></div>";
       $user = wp_get_current_user();
       $udata = $user->data;
@@ -1431,11 +1343,11 @@ class GHAX_Shortcode_Manager
         $expDateYear = urlencode(sanitize_text_field($_POST['cardyear']));
         $cvv2Number = urlencode(sanitize_text_field($_POST['cardcvv']));
         /*$address1 = urlencode($_POST['address']);
-			$address2 = '';
-			$city = urlencode($_POST['city']);
-			$state = urlencode($_POST['state']);
-			$zip = urlencode($_POST['zip']);
-			$country = 'US';*/  // US or other valid country code
+        $address2 = '';
+        $city = urlencode($_POST['city']);
+        $state = urlencode($_POST['state']);
+        $zip = urlencode($_POST['zip']);
+        $country = 'US';*/  // US or other valid country code
         $amount = sanitize_text_field($_POST['lead_price']);  //actual amount should be substituted here
         $currencyID = strtoupper($curr); // or other currency ('GBP', 'EUR', 'JPY', 'CAD', 'AUD')
 
@@ -1523,17 +1435,17 @@ class GHAX_Shortcode_Manager
       }
 
       ?>
-      <div class="price">Price :<br>
+      <!-- <div class="price">Price :<br>
         <span>
           <?php if ($lprice) {
 
             echo get_option('lead_currency') . $lprice;
           } else {
 
-            echo get_option('lead_currency') . '10.00';
+            echo get_option('lead_currency') . '0.00';
           } ?>
         </span>
-      </div>
+      </div> -->
 
       <div class="payment_options_container" style="<?php echo $display_data; ?>">
         <?php if (($paypal_s) && ($stripe_s)) { ?>
@@ -1760,7 +1672,7 @@ class GHAX_Shortcode_Manager
     // die;
     // $wpdb->query("alter table {$wpdb->prefix}ghaxlt_leads alter column lead_quantity set DEFAULT 1");
 
-    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
 
       echo '<p>You do not have access for this page.</p>';
       exit();
@@ -1776,7 +1688,7 @@ class GHAX_Shortcode_Manager
 
       <div class="leadssrt">
         <ul class="nav nav-tabs">
-          <li class="active nav-item"><a class="nav-link active" data-bs-toggle="tab" data-bs-target="#purchased_leads" href="#purchased_leads">Purchased Leads</a></li>
+          <li class="active nav-item"><a class="nav-link active" data-bs-toggle="tab" data-bs-target="#purchased_leads" href="#purchased_leads">My Assigned Leads</a></li>
           <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" data-bs-target="#leads_notifications" href="#leads_notifications">Notifications</a></li>
           <!--<li><a data-toggle="tab" href="#menu2">Menu 2</a></li>-->
         </ul>
@@ -1789,16 +1701,20 @@ class GHAX_Shortcode_Manager
               <table id="buyer-leadstbl" class="display mdl-data-table">
                 <thead>
                   <tr>
-                    <th>Email</th>
+                    <!-- <th>Email</th>
                     <th>Category</th>
                     <th>Group</th>
-                    <!--<th>Quality</th>-->
+                    <th>Quality</th>
+                    <th>Details</th> -->
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                    <th>Category</th>
                     <th>Details</th>
                   </tr>
                 </thead>
                 <tbody>
                   <?php
-                  $qry1 = "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE transaction_type = '$this->payment_mode' and user_id=" . $current_user_id;
+                  $qry1 = "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE user_id=" . $current_user_id;
                   $results1 = $wpdb->get_results($qry1);
                   if (count($results1) > 0) {
                     $leadsarr = array();
@@ -1817,6 +1733,18 @@ class GHAX_Shortcode_Manager
                             $myemail = $value;
                           }
                         }
+                        $myname = '';
+                        foreach ($myarr as $key => $value) {
+                          if ($key == 'Name') {
+                            $myname = $value;
+                          }
+                        }
+                        $myPhoneNumber = '';
+                        foreach ($myarr as $key => $value) {
+                          if ($key == 'Phone Number') {
+                            $myPhoneNumber = $value;
+                          }
+                        }
                         $ccat = 'N/A';
                         if ($result->category) {
                           $cqry = "SELECT * FROM {$wpdb->prefix}ghaxlt_lead_cats WHERE id=" . $result->category;
@@ -1826,22 +1754,22 @@ class GHAX_Shortcode_Manager
                           }
                         }
 
-                        $ggrp = 'N/A';
-                        if ($result->group) {
-                          $gqry = "SELECT * FROM {$wpdb->prefix}ghaxlt_lead_groups WHERE id=" . $result->group;
-                          $gres = $wpdb->get_row($gqry);
-                          if ($gres) {
-                            $ggrp = $gres->name;
-                          }
-                        }
+                        // $ggrp = 'N/A';
+                        // if ($result->group) {
+                        //   $gqry = "SELECT * FROM {$wpdb->prefix}ghaxlt_lead_groups WHERE id=" . $result->group;
+                        //   $gres = $wpdb->get_row($gqry);
+                        //   if ($gres) {
+                        //     $ggrp = $gres->name;
+                        //   }
+                        // }
 
                   ?>
                         <tr>
-                          <td><?php echo $myemail; ?></td>
-                          <td><?php echo $ccat; ?></td>
+                          <td><?php echo $myname; ?></td>
+                          <td><?php echo $myPhoneNumber; ?></td>
                           <!--<td><?php //echo $result->tag; 
                                   ?></td>-->
-                          <td><?php echo $ggrp; ?></td>
+                          <td><?php echo $ccat; ?></td>
                           <!--<td><?php //echo $result->quality; 
                                   ?></td>-->
                           <td><a href="<?php echo get_permalink(get_option('_leaddetail_page')); ?>?lead=<?php echo esc_attr($result->id); ?>" class="detailleadbtn">View Details</a></td>
@@ -1868,10 +1796,9 @@ class GHAX_Shortcode_Manager
                 </tbody>
                 <tfoot>
                   <tr>
-                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Phone Number</th>
                     <th>Category</th>
-                    <th>Group</th>
-                    <!--<th>Quality</th>-->
                     <th>Details</th>
                   </tr>
                 </tfoot>
@@ -1933,7 +1860,7 @@ class GHAX_Shortcode_Manager
     $user = wp_get_current_user();
     $current_user_id = get_current_user_id();
 
-    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+    if (!in_array('ghaxlt_buyer', (array) $user->roles) && !in_array('administrator', (array) $user->roles) && !in_array('ghaxlt_annual_buyer', (array) $user->roles) && !in_array('ghaxlt_monthly_buyer', (array) $user->roles)) {
       echo '<p>You do not have access for this page.</p>';
       exit();
     }

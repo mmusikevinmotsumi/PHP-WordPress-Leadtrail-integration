@@ -13,6 +13,10 @@ class GHAX_Public_Ajax
 
     add_action('wp_ajax_nopriv_lead_remove_cart', [$this,  'lead_remove_cart']);
     add_action('wp_ajax_lead_remove_cart', [$this, 'lead_remove_cart']);
+
+    add_action('wp_ajax_nopriv_confirm_add_to_cart', [$this,  'confirm_add_to_cart']);
+    add_action('wp_ajax_confirm_add_to_cart', [$this, 'confirm_add_to_cart']);
+
   }
 
   function lead_add_to_cart()
@@ -46,6 +50,11 @@ class GHAX_Public_Ajax
         $monthly_limit = get_option('monthly_limit_monthly');
         $yearly_limit = get_option('yearly_limit_monthly');
       }
+      if (strpos(implode(', ', $user_roles), 'administrator') !== false){
+        $daily_limit = 9999;
+        $monthly_limit = 9999;
+        $yearly_limit = 9999;
+      }
       
       
     } else {
@@ -66,7 +75,7 @@ class GHAX_Public_Ajax
     $id = array((int) $_POST['id']);
     if ($leadcart) {
       if (count($leadcart) >= $max_lead_purchase) {
-        echo "You can purchase maximum " . (int) $max_lead_purchase . " leads at a time";
+        echo "You may only request " . (int) $max_lead_purchase . " leads at a time";
         die();
       }
       else if (count($leadcart) + $daily_count >= $daily_limit) {
@@ -82,7 +91,19 @@ class GHAX_Public_Ajax
         die();
       }
       else {
-
+          // $wpdb->insert(
+          //   $wpdb->prefix . "ghaxlt_leads_payments",
+          //   array(
+          //     'user_id' => get_current_user_id(),
+          //     'lead_id' => $_POST['id'],
+          //     'payment_by' => 'N/A',
+          //     'amount' => 0,
+          //     'payment_id' => 'N/A',
+          //     'transaction_type' => 'N/A',
+          //   )
+          // );
+          // $wpdb->update($wpdb->prefix . "ghaxlt_leads", array('status' => 'sold'), array('id' => $_POST['id']));
+          // update_user_meta($user_id, 'leadcart', "");
       }
 
       if (in_array((int) $_POST['id'], $leadcart)) {
@@ -96,10 +117,59 @@ class GHAX_Public_Ajax
       }
     } else {
       $leadcart1 = $id;
+      // $wpdb->insert(
+      //   $wpdb->prefix . "ghaxlt_leads_payments",
+      //   array(
+      //     'user_id' => get_current_user_id(),
+      //     'lead_id' => $_POST['id'],
+      //     'payment_by' => 'N/A',
+      //     'amount' => 0,
+      //     'payment_id' => 'N/A',
+      //     'transaction_type' => 'N/A',
+      //   )
+      // );
+      // $wpdb->update($wpdb->prefix . "ghaxlt_leads", array('status' => 'sold'), array('id' => $_POST['id']));
+      // update_user_meta($user_id, 'leadcart', "");
     }
 
     update_user_meta($user_id, 'leadcart', $leadcart1);
     die();
+  }
+  
+  function confirm_add_to_cart()
+  {
+    if (!wp_verify_nonce($_POST['nc'], 'ltfrontend')) {
+      exit('Unauthorized Request');
+    }
+    $user_id = get_current_user_id();
+    $leadcart = get_user_meta($user_id, 'leadcart', true);
+    
+    global $wpdb;
+    
+    if ($leadcart) {
+      foreach ($leadcart as $key => $value) {
+        $wpdb->insert(
+          $wpdb->prefix . "ghaxlt_leads_payments",
+          array(
+            'user_id' => get_current_user_id(),
+            'lead_id' => $value,
+            'payment_by' => 'N/A',
+            'amount' => 0,
+            'payment_id' => 'N/A',
+            'transaction_type' => 'sandbox',
+          )
+        );
+        $wpdb->update($wpdb->prefix . "ghaxlt_leads", array('status' => 'sold'), array('id' => $value));
+      }
+      update_user_meta($user_id, 'leadcart', "");
+      wp_send_json_success(array(
+          'redirect_url' => get_permalink(get_option('_leadbuyerdashboard_page'))
+      ));
+    }
+    else{
+      wp_send_json_error('Please select leads from the table.');
+    } 
+    exit;
   }
 
   function directleadtobuy()
@@ -132,6 +202,18 @@ class GHAX_Public_Ajax
       });
       update_user_meta($user_id, 'leadcart', $leadcart1);
     }
+
+    // global $wpdb;
+
+    // $result = $wpdb->delete($wpdb->prefix . "ghaxlt_leads_payments", array('lead_id' => $del_val), array('%d'));
+
+    // if ($result !== false) {
+    //     echo "Row with ID ".$del_val." successfully deleted.";
+    //     $wpdb->update($wpdb->prefix . "ghaxlt_leads", array('status' => 'open'), array('id' => $del_val));
+    // } else {
+    //     echo "Failed to delete row with ID ".$del_val;
+    // }
+
     die();
   }
 }

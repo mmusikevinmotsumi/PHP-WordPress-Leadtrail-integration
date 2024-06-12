@@ -69,6 +69,7 @@ jQuery(document).ready(function ($) {
   $(document).on('click', '.leadaddtocart', function (event) {
     var id = $(this).attr('data-id');
     var $thisbutton = $(this);
+    
     $.ajax({
       type: 'post',
       url: ajax_script.ajaxurl,
@@ -86,15 +87,25 @@ jQuery(document).ready(function ($) {
           $thisbutton
             .parent()
             .html(
-              '<a class="added buyleadbtn" href="javascript:void(0)" >Added</a> <a class="remove_cart buyleadbtn" href="javascript:void(0)" data-id="' +
+              '<a class="added remove_cart buyleadbtn" href="javascript:void(0)" data-id="' +
                 id +
                 '">Remove</a>'
             );
+          console.log($(".lead-main-wrap .top-hdr-info ul li").length);
+          $(".lead-main-wrap").show();
+          $(".lead-main-wrap .top-hdr-info ul li").remove();
+
+          $("a.added").each(function(){
+            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("email") + "</li>")
+          })
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       },
     });
+    
     event.preventDefault();
   });
+
   $(document).on('click', '.remove_cart', function (event) {
     var id = $(this).attr('data-id');
     var $thisbutton = $(this);
@@ -114,10 +125,48 @@ jQuery(document).ready(function ($) {
           .html(
             '<a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="' +
               id +
-              '">Add to Cart</a> '
+              '">Get Access</a> '
           );
+        $(this).parents("tr").removeClass("added");
+        $(".lead-main-wrap .top-hdr-info ul li").remove();
+        if($("a.added").length<1){
+          $(".lead-main-wrap").hide();
+        }
+        else{
+          $("a.added").each(function(){
+            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("email") + "</li>")
+          })
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       },
     });
+    
+    event.preventDefault();
+  });
+
+  $(document).on('click', '.confirmaddtocart', function (event) {
+    console.log("Run JavaScript - confirmaddtocart");
+    var $thisbutton = $(this);
+    if($("a.added").length>0){
+      $.ajax({
+        type: 'post',
+        url: ajax_script.ajaxurl,
+        data: { action: 'confirm_add_to_cart', nc: ajax_script.nc },
+        beforeSend: function (response) {
+          $thisbutton.addClass('loading');
+        },
+        complete: function (response) {
+          $thisbutton.removeClass('loading');
+        },
+        success: function (response) {
+          window.location.href = response.data.redirect_url
+        },
+        error: function() {
+          alert('There was an error processing your request. Please try again later.');
+        }
+      });
+    }
+    
     event.preventDefault();
   });
 

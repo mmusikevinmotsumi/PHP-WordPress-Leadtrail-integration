@@ -758,7 +758,7 @@ div[slider] > input[type='range']::-ms-tooltip {
 }
 
 a.leadaddtocart.buyleadbtn {
-  background: #734a9d !important;
+  background: #3cbaff !important;
   display: inline-block;
   height: 37px;
   line-height: 18px;
@@ -767,7 +767,7 @@ a.leadaddtocart.buyleadbtn {
 }
 
 a.added.buyleadbtn {
-  background: #734a9d !important;
+  background: #3cbaff !important;
   display: inline-block;
   height: 37px;
   line-height: 18px;
@@ -780,6 +780,11 @@ a.remove_cart.buyleadbtn {
   line-height: 18px;
   width: 133px;
   margin: 10px 0px 0px 0px;
+  background: #333333 !important;
+
+}
+a.buyleadbtn.confirmaddtocart{
+  background: #3cbaff !important;
 }
 
 .buyleadbtn {
