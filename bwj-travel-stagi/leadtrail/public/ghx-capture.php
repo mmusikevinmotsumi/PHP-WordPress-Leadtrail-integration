@@ -400,10 +400,15 @@ class GHAX_Capture
     $qry = "SELECT * FROM " . $wpdb->prefix . "ghaxlt_lead_groups WHERE forms LIKE '%" . $form_id . "%'";
     $res = $wpdb->get_row($qry);
 
+    if ($res->id == 1){
+      $category = 2;
+      $lead_quantity = 1;
+    }
+
     $tbllds = $wpdb->prefix . 'ghaxlt_leads';
     $wpdb->insert($tbllds, array(
       'form_name' => $form_name, 'data' => $fdata, 'lead_quantity' => $lead_quantity,
-      'created_date' => date('Y-m-d H:i:s'), 'group' => $res->id, 'submitted_by' => 'ninja-forms', 'status' => 'open', 'publish' => intval($publish)
+      'created_date' => date('Y-m-d H:i:s'), 'group' => $res->id, 'category' => $category, 'submitted_by' => 'ninja-forms', 'status' => 'open', 'publish' => intval($publish)
     ));
 
     $lead_id =  $wpdb->insert_id;

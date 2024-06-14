@@ -89,6 +89,7 @@ class GHAX_Shortcode_Manager
                 <th <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Email</th>
                 <th <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Form Name</th>
                 <th <?php echo (in_array('purchased_count', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Purchase Count</th>
+                <th <?php echo (in_array('additional_info', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Additional Info</th>
                 <th <?php echo (in_array('category', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Category</th>
                 <th <?php echo (in_array('group', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Group</th>
                 <th <?php echo (in_array('status', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Status</th>
@@ -101,7 +102,7 @@ class GHAX_Shortcode_Manager
                 <th style="display:none"></th>
                 <th <?php echo (in_array('published', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Published</th>
                 <th <?php echo (in_array('created', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Created On</th>
-                <th>Purchase</th>
+                <th>Access Lead</th>
               </thead>
               <tbody>
                 <?php
@@ -134,6 +135,9 @@ class GHAX_Shortcode_Manager
                     if ($key == 'lead-country') {
                       $country = $value;
                     }
+                    if ($key == 'Additional Info') {
+                      $additional_info = $value;
+                    }
                   }
                   $price = $result->totalprice;
                 ?>
@@ -142,6 +146,7 @@ class GHAX_Shortcode_Manager
                     <td <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ghax_obfuscate_email($myemail); ?></td>
                     <td <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->form_name) ? esc_html($result->form_name) : 'N/A'; ?></td>
                     <td <?php echo (in_array('purchased_count', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($result->buylead . '/' . $result->new_lead_quantity); ?></td>
+                    <td <?php echo (in_array('additional_info', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($additional_info); ?></td>
                     <td <?php echo (in_array('category', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->cat_name) ? esc_html($result->cat_name) : 'N/A'; ?></td>
                     <td <?php echo (in_array('group', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->group_name) ? $result->group_name : 'N/A'; ?></td>
                     <td <?php echo (in_array('status', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->status) ? esc_html($result->status) : 'N/A'; ?></td>

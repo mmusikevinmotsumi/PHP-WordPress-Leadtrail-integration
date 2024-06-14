@@ -968,12 +968,11 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
                   <th>
                     <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="state" <?php echo (in_array('state', $lead_field_display)) ? 'checked' : ''; ?>>State</div>
                   </th>
-                </tr>
-
-                <tr>
                   <th>
                     <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="city" <?php echo (in_array('city', $lead_field_display)) ? 'checked' : ''; ?>>City</div>
                   </th>
+                </tr>
+                <tr>
                   <th>
                     <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="zipcode" <?php echo (in_array('zipcode', $lead_field_display)) ? 'checked' : ''; ?>>Zipcode</div>
                   </th>
@@ -985,6 +984,9 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
                   </th>
                   <th>
                     <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="created" <?php echo (in_array('created', $lead_field_display)) ? 'checked' : ''; ?>>Created On</div>
+                  </th>
+                  <th>
+                    <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="additional_info" <?php echo (in_array('additional_info', $lead_field_display)) ? 'checked' : ''; ?>>Additional Info</div>
                   </th>
                 </tr>
               </table>
