@@ -46,7 +46,7 @@ class GHAX_Shortcode_Manager
 
       $price_result = $wpdb->get_results("select MIN(COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cats.price,0)) as min_price,MAX(COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cats.price,0)) as max_price from {$wpdb->prefix}ghaxlt_leads as gaxlead  left join  {$this->tblgrps} as grps on gaxlead.group=grps.id left join  {$this->tblqlty} as qlty on gaxlead.quality=qlty.id left join {$this->tblcats} as cats on gaxlead.category=cats.id WHERE gaxlead.publish=1");
 
-      $results = $wpdb->get_results("select gaxlead.*,coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),1) as new_lead_quantity,cat.name as cat_name,grps.name as group_name,qlty.name as quality_name,COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cat.price,0) as totalprice,(SELECT count(*) as count FROM {$this->tblpymts} WHERE lead_id=gaxlead.id and transaction_type='{$this->payment_mode}' order by id desc) as buylead from {$wpdb->prefix}ghaxlt_leads as gaxlead left join  {$this->tblcats} as cat on gaxlead.category=cat.id left join  {$this->tblgrps} as grps on gaxlead.group=grps.id left join  {$this->tblqlty} as qlty on gaxlead.quality=qlty.id WHERE gaxlead.publish=1 having coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),0)>=buylead");
+      $results = $wpdb->get_results("select gaxlead.*,coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),1) as new_lead_quantity,cat.name as cat_name,grps.name as group_name,qlty.name as quality_name,COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cat.price,0) as totalprice,(SELECT count(*) as count FROM {$this->tblpymts} WHERE lead_id=gaxlead.id and transaction_type='{$this->payment_mode}' order by id desc) as buylead from {$wpdb->prefix}ghaxlt_leads as gaxlead left join  {$this->tblcats} as cat on gaxlead.category=cat.id left join  {$this->tblgrps} as grps on gaxlead.group=grps.id left join  {$this->tblqlty} as qlty on gaxlead.quality=qlty.id WHERE gaxlead.publish=1 having coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),0)>=buylead ORDER BY created_date DESC");
 
       // print_r($results);
       // exit();
@@ -87,6 +87,7 @@ class GHAX_Shortcode_Manager
             <table id="leadstbl" style="width:100%;" class="table table-bordered">
               <thead>
                 <th <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Email</th>
+                <th <?php echo (in_array('full_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Name</th>
                 <th <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Form Name</th>
                 <th <?php echo (in_array('purchased_count', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Purchase Count</th>
                 <th <?php echo (in_array('additional_info', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Additional Info</th>
@@ -114,6 +115,7 @@ class GHAX_Shortcode_Manager
 
                   $myarr = json_decode($result->data, true);
                   $myemail = "N/A";
+                  $full_name = "N/A";
                   $city = "N/A";
                   $state = "N/A";
                   $zipcode = "N/A";
@@ -122,6 +124,9 @@ class GHAX_Shortcode_Manager
 
                     if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
                       $myemail = $value;
+                    }
+                    if ($key == 'Name') {
+                      $full_name = $value;
                     }
                     if ($key == 'lead-city') {
                       $city = $value;
@@ -144,6 +149,7 @@ class GHAX_Shortcode_Manager
 
                   <tr id="delete_<?php echo esc_attr($result->id); ?>" email="<?php echo ghax_obfuscate_email($myemail);?>">
                     <td <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ghax_obfuscate_email($myemail); ?></td>
+                    <td <?php echo (in_array('full_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($full_name); ?></td>
                     <td <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->form_name) ? esc_html($result->form_name) : 'N/A'; ?></td>
                     <td <?php echo (in_array('purchased_count', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($result->buylead . '/' . $result->new_lead_quantity); ?></td>
                     <td <?php echo (in_array('additional_info', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($additional_info); ?></td>
@@ -1714,7 +1720,9 @@ class GHAX_Shortcode_Manager
                     <th>Name</th>
                     <th>Phone Number</th>
                     <th>Category</th>
+                    <th>Created On</th>
                     <th>Details</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1777,6 +1785,7 @@ class GHAX_Shortcode_Manager
                           <td><?php echo $ccat; ?></td>
                           <!--<td><?php //echo $result->quality; 
                                   ?></td>-->
+                          <td><?php echo date('m-d-Y h:i:s A', strtotime($result->created_date)); ?></td>
                           <td><a href="<?php echo get_permalink(get_option('_leaddetail_page')); ?>?lead=<?php echo esc_attr($result->id); ?>" class="detailleadbtn">View Details</a></td>
 
                         </tr>
@@ -1804,6 +1813,7 @@ class GHAX_Shortcode_Manager
                     <th>Name</th>
                     <th>Phone Number</th>
                     <th>Category</th>
+                    <th>Created On</th>
                     <th>Details</th>
                   </tr>
                 </tfoot>

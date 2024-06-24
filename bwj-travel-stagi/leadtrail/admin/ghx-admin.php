@@ -943,6 +943,9 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
                     <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="email" <?php echo (in_array('email', $lead_field_display)) ? 'checked' : ''; ?>>Email</div>
                   </th>
                   <th>
+                    <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="full_name" <?php echo (in_array('full_name', $lead_field_display)) ? 'checked' : ''; ?>>Full Name</div>
+                  </th>
+                  <th>
                     <div class="lead-input-checkbox"><input type="checkbox" name="lead_field_display[]" value="from_name" <?php echo (in_array('from_name', $lead_field_display)) ? 'checked' : ''; ?>>Form Name</div>
                   </th>
                   <th>
