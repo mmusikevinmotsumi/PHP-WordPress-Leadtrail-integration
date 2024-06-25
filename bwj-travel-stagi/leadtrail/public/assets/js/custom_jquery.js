@@ -92,11 +92,12 @@ jQuery(document).ready(function ($) {
                 '">Remove</a>'
             );
           console.log($(".lead-main-wrap .top-hdr-info ul li").length);
+          console.log($("a.added").length);
           $(".lead-main-wrap").show();
           $(".lead-main-wrap .top-hdr-info ul li").remove();
 
           $("a.added").each(function(){
-            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("email") + "</li>")
+            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("name") + "</li>")
           })
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -134,7 +135,7 @@ jQuery(document).ready(function ($) {
         }
         else{
           $("a.added").each(function(){
-            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("email") + "</li>")
+            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("name") + "</li>")
           })
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });

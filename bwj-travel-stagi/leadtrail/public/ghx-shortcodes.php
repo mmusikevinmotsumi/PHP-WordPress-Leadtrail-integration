@@ -147,7 +147,7 @@ class GHAX_Shortcode_Manager
                   $price = $result->totalprice;
                 ?>
 
-                  <tr id="delete_<?php echo esc_attr($result->id); ?>" email="<?php echo ghax_obfuscate_email($myemail);?>">
+                  <tr id="delete_<?php echo esc_attr($result->id); ?>" name="<?php echo $full_name;?>">
                     <td <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ghax_obfuscate_email($myemail); ?></td>
                     <td <?php echo (in_array('full_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($full_name); ?></td>
                     <td <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->form_name) ? esc_html($result->form_name) : 'N/A'; ?></td>
@@ -239,7 +239,7 @@ class GHAX_Shortcode_Manager
             jQuery(".lead-main-wrap").hide();
           }
           jQuery("a.added").each(function(){
-            jQuery(".lead-main-wrap .top-hdr-info ul").append("<li>" + jQuery(this).parents("tr").attr("email") + "</li>")
+            jQuery(".lead-main-wrap .top-hdr-info ul").append("<li>" + jQuery(this).parents("tr").attr("name") + "</li>")
           })
         </script>
       <?php
