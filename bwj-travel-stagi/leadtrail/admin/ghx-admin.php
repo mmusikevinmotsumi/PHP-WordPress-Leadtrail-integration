@@ -1745,22 +1745,22 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
       require_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
       $forms = array();
-      if (is_plugin_active('elementor-pro/elementor-pro.php')) {
-        $elemontor_form_data =  $wpdb->get_results("select pmeta.meta_value,pmeta.post_id from {$wpdb->prefix}postmeta as pmeta left join {$wpdb->prefix}posts as p on p.id=pmeta.post_id where meta_key='_elementor_data' and meta_value like '%\"settings\":{\"form_name\"%' and p.post_status ='publish'");
-        if ($elemontor_form_data) {
-          foreach ($elemontor_form_data as $elemontor_form_list) {
-            if (isset($elemontor_form_list->meta_value) && $elemontor_form_list->meta_value) {
-              $elemontor_form_array = json_decode($elemontor_form_list->meta_value, true);
-              if ($elemontor_form_list->meta_value && is_array($elemontor_form_array)) {
-                $parent_array = ghax_search($elemontor_form_array, 'widgetType', 'form');
-                $form_id   = $elemontor_form_list->post_id . '-' . $parent_array[0]['id'];
-                $form_name   = $parent_array[0]['settings']['form_name'];
-                $forms[$form_id] = $form_name . '(elementor forms)';
-              }
-            }
-          }
-        }
-      }
+      // if (is_plugin_active('elementor-pro/elementor-pro.php')) {
+      //   $elemontor_form_data =  $wpdb->get_results("select pmeta.meta_value,pmeta.post_id from {$wpdb->prefix}postmeta as pmeta left join {$wpdb->prefix}posts as p on p.id=pmeta.post_id where meta_key='_elementor_data' and meta_value like '%\"settings\":{\"form_name\"%' and p.post_status ='publish'");
+      //   if ($elemontor_form_data) {
+      //     foreach ($elemontor_form_data as $elemontor_form_list) {
+      //       if (isset($elemontor_form_list->meta_value) && $elemontor_form_list->meta_value) {
+      //         $elemontor_form_array = json_decode($elemontor_form_list->meta_value, true);
+      //         if ($elemontor_form_list->meta_value && is_array($elemontor_form_array)) {
+      //           $parent_array = ghax_search($elemontor_form_array, 'widgetType', 'form');
+      //           $form_id   = $elemontor_form_list->post_id . '-' . $parent_array[0]['id'];
+      //           $form_name   = $parent_array[0]['settings']['form_name'];
+      //           $forms[$form_id] = $form_name . '(elementor forms)';
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
       /*
 			$argse = array(
 							'post_type' => array('post','page'),
@@ -1783,16 +1783,16 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
 			endwhile;
 			wp_reset_postdata(); */
 
-      if (is_plugin_active('ninja-forms/ninja-forms.php')) {
-        $ninjaforms = Ninja_Forms()->form()->get_forms();
+      // if (is_plugin_active('ninja-forms/ninja-forms.php')) {
+      //   $ninjaforms = Ninja_Forms()->form()->get_forms();
 
-        foreach ($ninjaforms as $ninjaform) {
-          $form_id   = $ninjaform->get_id();
-          $form_name   = $ninjaform->get_setting('title');
-          // Do more stuff
-          $forms[$form_id] = $form_name . '(ninja forms)';
-        }
-      }
+      //   foreach ($ninjaforms as $ninjaform) {
+      //     $form_id   = $ninjaform->get_id();
+      //     $form_name   = $ninjaform->get_setting('title');
+      //     // Do more stuff
+      //     $forms[$form_id] = $form_name . '(ninja forms)';
+      //   }
+      // }
 
       if (is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
         $cargs = array('post_type' => 'wpcf7_contact_form', 'posts_per_page' => -1);
@@ -1825,8 +1825,9 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
         foreach ($gforms as $gform) {
           $form_id = $gform['id'];
           $form_name = $gform['title'];
+          $forms[$form_id] = $form_name . '(Gravity forms)';
         }
-        $forms[$form_id] = $form_name . '(Gravity forms)';
+        
       }
 
       if (is_plugin_active('forminator/forminator.php')) {
@@ -1872,6 +1873,7 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
                   <select multiple name="group_form[]" required>
                     <option value="">-SELECT-</option>
                     <?php
+                    echo count($forms);
                     foreach ($forms as $key => $value) {
                     ?>
                       <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($value); ?></option>
@@ -2143,22 +2145,22 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
 
 
       $forms = array();
-      if (is_plugin_active('elementor-pro/elementor-pro.php')) {
-        $elemontor_form_data =  $wpdb->get_results("select pmeta.meta_value,pmeta.post_id from {$wpdb->prefix}postmeta as pmeta left join {$wpdb->prefix}posts as p on p.id=pmeta.post_id where meta_key='_elementor_data' and meta_value like '%\"settings\":{\"form_name\"%' and p.post_status ='publish'");
-        if ($elemontor_form_data) {
-          foreach ($elemontor_form_data as $elemontor_form_list) {
-            if (isset($elemontor_form_list->meta_value) && $elemontor_form_list->meta_value) {
-              $elemontor_form_array = json_decode($elemontor_form_list->meta_value, true);
-              if ($elemontor_form_list->meta_value && is_array($elemontor_form_array)) {
-                $parent_array = ghax_search($elemontor_form_array, 'widgetType', 'form');
-                $form_id   = $elemontor_form_list->post_id . '-' . $parent_array[0]['id'];
-                $form_name   = $parent_array[0]['settings']['form_name'];
-                $forms[$form_id] = $form_name . '(elementor forms)';
-              }
-            }
-          }
-        }
-      }
+      // if (is_plugin_active('elementor-pro/elementor-pro.php')) {
+      //   $elemontor_form_data =  $wpdb->get_results("select pmeta.meta_value,pmeta.post_id from {$wpdb->prefix}postmeta as pmeta left join {$wpdb->prefix}posts as p on p.id=pmeta.post_id where meta_key='_elementor_data' and meta_value like '%\"settings\":{\"form_name\"%' and p.post_status ='publish'");
+      //   if ($elemontor_form_data) {
+      //     foreach ($elemontor_form_data as $elemontor_form_list) {
+      //       if (isset($elemontor_form_list->meta_value) && $elemontor_form_list->meta_value) {
+      //         $elemontor_form_array = json_decode($elemontor_form_list->meta_value, true);
+      //         if ($elemontor_form_list->meta_value && is_array($elemontor_form_array)) {
+      //           $parent_array = ghax_search($elemontor_form_array, 'widgetType', 'form');
+      //           $form_id   = $elemontor_form_list->post_id . '-' . $parent_array[0]['id'];
+      //           $form_name   = $parent_array[0]['settings']['form_name'];
+      //           $forms[$form_id] = $form_name . '(elementor forms)';
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
       /*
 			$argse = array(
 							'post_type' => array('post','page'),
@@ -2180,16 +2182,16 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
 			endwhile;
 			wp_reset_postdata(); */
 
-      if (is_plugin_active('ninja-forms/ninja-forms.php')) {
-        $ninjaforms = Ninja_Forms()->form()->get_forms();
+      // if (is_plugin_active('ninja-forms/ninja-forms.php')) {
+      //   $ninjaforms = Ninja_Forms()->form()->get_forms();
 
-        foreach ($ninjaforms as $ninjaform) {
-          $form_id   = $ninjaform->get_id();
-          $form_name   = $ninjaform->get_setting('title');
-          // Do more stuff
-          $forms[$form_id] = $form_name . '(ninja forms)';
-        }
-      }
+      //   foreach ($ninjaforms as $ninjaform) {
+      //     $form_id   = $ninjaform->get_id();
+      //     $form_name   = $ninjaform->get_setting('title');
+      //     // Do more stuff
+      //     $forms[$form_id] = $form_name . '(ninja forms)';
+      //   }
+      // }
 
       if (is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
         $cargs = array('post_type' => 'wpcf7_contact_form', 'posts_per_page' => -1);
@@ -2224,8 +2226,9 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
         foreach ($gforms as $gform) {
           $form_id = $gform['id'];
           $form_name = $gform['title'];
+          $forms[$form_id] = $form_name . '(Gravity forms)';
+
         }
-        $forms[$form_id] = $form_name . '(Gravity forms)';
       }
 
       if (is_plugin_active('forminator/forminator.php')) {

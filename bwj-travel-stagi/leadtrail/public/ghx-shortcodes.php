@@ -46,7 +46,7 @@ class GHAX_Shortcode_Manager
 
       $price_result = $wpdb->get_results("select MIN(COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cats.price,0)) as min_price,MAX(COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cats.price,0)) as max_price from {$wpdb->prefix}ghaxlt_leads as gaxlead  left join  {$this->tblgrps} as grps on gaxlead.group=grps.id left join  {$this->tblqlty} as qlty on gaxlead.quality=qlty.id left join {$this->tblcats} as cats on gaxlead.category=cats.id WHERE gaxlead.publish=1");
 
-      $results = $wpdb->get_results("select gaxlead.*,coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),1) as new_lead_quantity,cat.name as cat_name,grps.name as group_name,qlty.name as quality_name,COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cat.price,0) as totalprice,(SELECT count(*) as count FROM {$this->tblpymts} WHERE lead_id=gaxlead.id and transaction_type='{$this->payment_mode}' order by id desc) as buylead from {$wpdb->prefix}ghaxlt_leads as gaxlead left join  {$this->tblcats} as cat on gaxlead.category=cat.id left join  {$this->tblgrps} as grps on gaxlead.group=grps.id left join  {$this->tblqlty} as qlty on gaxlead.quality=qlty.id WHERE gaxlead.publish=1 having coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),0)>=buylead ORDER BY created_date DESC");
+      $results = $wpdb->get_results("select gaxlead.*,coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),1) as new_lead_quantity,cat.name as cat_name,grps.name as group_name,qlty.name as quality_name,COALESCE(grps.price,0)+COALESCE(qlty.price,0)+COALESCE(cat.price,0) as totalprice,(SELECT count(*) as count FROM {$this->tblpymts} WHERE lead_id=gaxlead.id and transaction_type='{$this->payment_mode}' order by id desc) as buylead from {$wpdb->prefix}ghaxlt_leads as gaxlead left join  {$this->tblcats} as cat on gaxlead.category=cat.id left join  {$this->tblgrps} as grps on gaxlead.group=grps.id left join  {$this->tblqlty} as qlty on gaxlead.quality=qlty.id WHERE gaxlead.publish=1 having coalesce(nullif(rtrim(ltrim(gaxlead.lead_quantity)),''),0)>=buylead ORDER BY id DESC");
 
       // print_r($results);
       // exit();
@@ -112,7 +112,7 @@ class GHAX_Shortcode_Manager
                   if ($result->buylead >= $result->new_lead_quantity) {
                     continue;
                   }
-
+                  // echo $result -> id;
                   $myarr = json_decode($result->data, true);
                   $myemail = "N/A";
                   $full_name = "N/A";
@@ -163,30 +163,33 @@ class GHAX_Shortcode_Manager
                     <td <?php echo (in_array('zipcode', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($zipcode); ?></td>
                     <td <?php echo (in_array('price', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
                       <?php
-                      if ($price) {
-                        if ($result->discount_quantity) {
-                          if ($result->lead_discount) {
-                            if ($result->buylead >= $result->discount_quantity) {
-                              $discount_multi = floor($result->buylead / $result->discount_quantity);
-                              echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
-                              $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
-                              if ($price <= 0) {
-                                $price = 0;
-                              }
-                            }
-                          }
-                        }
-                        echo esc_html(get_option('lead_currency') . $price);
-                      } else {
-                        echo 'N/A';
-                      } ?>
+                      // if ($price) {
+                      //   if ($result->discount_quantity) {
+                      //     if ($result->lead_discount) {
+                      //       if ($result->buylead >= $result->discount_quantity) {
+                      //         $discount_multi = floor($result->buylead / $result->discount_quantity);
+                      //         echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
+                      //         $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
+                      //         if ($price <= 0) {
+                      //           $price = 0;
+                      //         }
+                      //       }
+                      //     }
+                      //   }
+                      //   echo esc_html(get_option('lead_currency') . $price);
+                      // } else {
+                      //   echo 'N/A';
+                      // } 
+                      ?>
                     </td>
                     <td style="display:none">
-                      <?php if ($price && $price >= 0) {
-                        echo $price;
-                      } else {
-                        echo 0;
-                      } ?>
+                      <?php 
+                      // if ($price && $price >= 0) {
+                      //   echo $price;
+                      // } else {
+                      //   echo 0;
+                      // } 
+                      ?>
                     </td>
                     <td <?php echo (in_array('published', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
                       <?php if ($result->publish == 1) {
@@ -241,6 +244,44 @@ class GHAX_Shortcode_Manager
           jQuery("a.added").each(function(){
             jQuery(".lead-main-wrap .top-hdr-info ul").append("<li>" + jQuery(this).parents("tr").attr("name") + "</li>")
           })
+        </script>
+        <script>
+          function sortTableById() {
+              var table, rows, switching, i, x, y, shouldSwitch;
+              table = document.getElementById("leadstbl");
+              switching = true;
+
+              // Loop to keep switching until no switching has been done
+              while (switching) {
+                  switching = false;
+                  rows = table.rows;
+
+                  // Loop through all table rows (except the headers)
+                  for (i = 1; i < (rows.length - 1); i++) {
+                      shouldSwitch = false;
+                      
+                      // Get the two elements to compare
+                      x = rows[i].getAttribute("id");
+                      y = rows[i + 1].getAttribute("id");
+
+                      // Compare the two rows
+                      if (parseInt(x.split("_")[1]) > parseInt(y.split("_")[1])) {
+                          shouldSwitch = true;
+                          break;
+                      }
+                  }
+                  if (shouldSwitch) {
+                      // If a switch is needed, perform the switch and mark that a switch has been done
+                      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                      switching = true;
+                  }
+              }
+          }
+
+          // Call the sorting function after the page has loaded
+          window.onload = function() {
+              sortTableById();
+          };
         </script>
       <?php
       } else {
