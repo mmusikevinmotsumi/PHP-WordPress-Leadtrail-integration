@@ -55,9 +55,9 @@ class GHAX_Public_Ajax
         $yearly_limit = get_option('yearly_limit_monthly');
       }
       if (strpos(implode(', ', $user_roles), 'administrator') !== false){
-        $daily_limit = get_option('daily_limit_annual');
-        $monthly_limit = get_option('monthly_limit_annual');
-        $yearly_limit = get_option('yearly_limit_annual');
+        $daily_limit = 9999;
+        $monthly_limit = 9999;
+        $yearly_limit = 9999;
       }
       
       
