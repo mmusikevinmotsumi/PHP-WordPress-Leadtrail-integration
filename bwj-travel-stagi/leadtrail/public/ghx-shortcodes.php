@@ -1251,6 +1251,9 @@ class GHAX_Shortcode_Manager
       if (get_option('paypal_api_username') && get_option('paypal_api_password') && get_option('paypal_api_signature')) {
         $paypal_s = true;
       }
+      if (get_option('authorize_api_login') && get_option('authorize_transaction_key') && get_option('authorize_signature_key')) {
+        $authorize_net_s = true;
+      }
       if (get_option('stripe_publishable_key') && (get_option('stripe_secret_key'))) {
         require_once('stripe-php/init.php');
         $stripe = new \Stripe\StripeClient(

@@ -828,6 +828,9 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
     $paypal_api_username = get_option('paypal_api_username');
     $paypal_api_password = get_option('paypal_api_password');
     $paypal_api_signature = get_option('paypal_api_signature');
+    $authorize_api_login = get_option('authorize_api_login');
+    $authorize_transaction_key = get_option('authorize_transaction_key');
+    $authorize_signature_key = get_option('authorize_signature_key');
     $stripe_mode = get_option('stripe_mode');
     $stripe_publishable_key = get_option('stripe_publishable_key');
     $stripe_secret_key = get_option('stripe_secret_key');
@@ -1362,6 +1365,57 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
                 <label>API Signature</label>
                 <div class="form-class">
                   <input type="text" name="paypal_api_signature" value="<?php echo esc_attr($paypal_api_signature); ?>">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <h3 class="pay">Authorize.net</h3>
+            <div class="col-md-3">
+              <div class="form-group <?php echo esc_attr(get_option('stripe_mode')); ?>">
+                <label>Mode</label>
+                <div class="form-class">
+                  <select name="paypal_mode">
+                    <option value="">-SELECT-</option>
+                    <option value="live" <?php if ($paypal_mode == 'live') {
+                                            echo "selected";
+                                          } ?>>Live</option>
+                    <option value="sandbox" <?php if ($paypal_mode == 'sandbox') {
+                                              echo "selected";
+                                            } ?>>Sandbox</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!--<div class="form-group">
+							<label>Email</label>
+							<div class="form-class">
+								<input type="text" name="paypal_email" value="<?php //echo $paypal_email; 
+                                                              ?>">
+							</div>
+						</div>-->
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>API Login ID</label>
+                <div class="form-class">
+                  <input type="text" name="authorize_api_login" value="<?php echo esc_attr($authorize_api_login); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Transaction Key</label>
+                <div class="form-class">
+                  <input type="text" name="authorize_transaction_key" value="<?php echo esc_attr($authorize_transaction_key); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Signature Key</label>
+                <div class="form-class">
+                  <input type="text" name="authorize_signature_key" value="<?php echo esc_attr($authorize_signature_key); ?>">
                 </div>
               </div>
             </div>

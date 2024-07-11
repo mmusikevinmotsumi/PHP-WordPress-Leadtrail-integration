@@ -294,6 +294,9 @@ class GHAX_Leadtrail_Handlers
       $paypal_api_username = sanitize_text_field($_POST['paypal_api_username']);
       $paypal_api_password = sanitize_text_field($_POST['paypal_api_password']);
       $paypal_api_signature = sanitize_text_field($_POST['paypal_api_signature']);
+      $authorize_api_login = sanitize_text_field($_POST['authorize_api_login']);
+      $authorize_transaction_key = sanitize_text_field($_POST['authorize_transaction_key']);
+      $authorize_signature_key = sanitize_text_field($_POST['authorize_signature_key']);
       $stripe_mode = sanitize_text_field($_POST['stripe_mode']);
       $stripe_publishable_key = sanitize_text_field($_POST['stripe_publishable_key']);
       $stripe_secret_key = sanitize_text_field($_POST['stripe_secret_key']);
@@ -345,6 +348,9 @@ class GHAX_Leadtrail_Handlers
       update_option('paypal_api_username', $paypal_api_username);
       update_option('paypal_api_password', $paypal_api_password);
       update_option('paypal_api_signature', $paypal_api_signature);
+      update_option('authorize_api_login', $authorize_api_login);
+      update_option('authorize_transaction_key', $authorize_transaction_key);
+      update_option('authorize_signature_key', $authorize_signature_key);
       update_option('stripe_mode', $stripe_mode);
       update_option('stripe_publishable_key', $stripe_publishable_key);
       update_option('stripe_secret_key', $stripe_secret_key);

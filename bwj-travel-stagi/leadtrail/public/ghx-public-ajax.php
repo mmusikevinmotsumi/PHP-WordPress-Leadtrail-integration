@@ -101,15 +101,15 @@ class GHAX_Public_Ajax
         echo "You may only request " . (int) $max_lead_purchase . " leads at a time";
         die();
       }
-      else if (count($leadcart) + $daily_count >= $daily_limit) {
+      else if (count($leadcart) + $daily_count > $daily_limit) {
         echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
         die();
       }
-      else if (count($leadcart) + $monthly_count >= $monthly_limit) {
+      else if (count($leadcart) + $monthly_count > $monthly_limit) {
         echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
         die();
       }
-      else if (count($leadcart) + $yearly_count >= $yearly_limit) {
+      else if (count($leadcart) + $yearly_count > $yearly_limit) {
         echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
         die();
       }
