@@ -53,7 +53,7 @@ class GHAX_Shortcode_Manager
       //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}ghaxlt_leads WHERE `publish`=1  order by id desc");
 
       if (count($results) > 0) {
-?>
+    ?>
 
         <div class="container">
           <div class="leadssrt">
@@ -71,7 +71,7 @@ class GHAX_Shortcode_Manager
                 if ($multiple_lead) { ?>
                   <div class="lead-main-wrap" style="display:none;">
                     <div class="top-hdr-info">
-                      <p style="font-weight:bold;;">You are requesting access to the following lead:</p>
+                      <p style="font-weight:bold;;">You are requesting access to the following leads:</p>
                       <ul>                        
                       </ul>
                     </div>
@@ -102,7 +102,7 @@ class GHAX_Shortcode_Manager
                 <th <?php echo (in_array('price', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Price</th>
                 <th style="display:none"></th>
                 <th <?php echo (in_array('published', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Published</th>
-                <th <?php echo (in_array('created', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Created On</th>
+                <th id="created_on" class="sorting_disabled" <?php echo (in_array('created', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Created On</th>
                 <th>Access Lead</th>
               </thead>
               <tbody>
@@ -147,7 +147,7 @@ class GHAX_Shortcode_Manager
                   $price = $result->totalprice;
                 ?>
 
-                  <tr id="delete_<?php echo esc_attr($result->id); ?>" name="<?php echo $full_name;?>">
+                  <tr id="delete_<?php echo esc_attr($result->id); ?>" name="<?php echo $full_name;?>" price="<?php echo $price;?>">
                     <td <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ghax_obfuscate_email($myemail); ?></td>
                     <td <?php echo (in_array('full_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($full_name); ?></td>
                     <td <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->form_name) ? esc_html($result->form_name) : 'N/A'; ?></td>
@@ -163,32 +163,32 @@ class GHAX_Shortcode_Manager
                     <td <?php echo (in_array('zipcode', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($zipcode); ?></td>
                     <td <?php echo (in_array('price', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
                       <?php
-                      // if ($price) {
-                      //   if ($result->discount_quantity) {
-                      //     if ($result->lead_discount) {
-                      //       if ($result->buylead >= $result->discount_quantity) {
-                      //         $discount_multi = floor($result->buylead / $result->discount_quantity);
-                      //         echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
-                      //         $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
-                      //         if ($price <= 0) {
-                      //           $price = 0;
-                      //         }
-                      //       }
-                      //     }
-                      //   }
-                      //   echo esc_html(get_option('lead_currency') . $price);
-                      // } else {
-                      //   echo 'N/A';
-                      // } 
+                      if ($price) {
+                        if ($result->discount_quantity) {
+                          if ($result->lead_discount) {
+                            if ($result->buylead >= $result->discount_quantity) {
+                              $discount_multi = floor($result->buylead / $result->discount_quantity);
+                              echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
+                              $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
+                              if ($price <= 0) {
+                                $price = 0;
+                              }
+                            }
+                          }
+                        }
+                        echo esc_html(get_option('lead_currency') . $price);
+                      } else {
+                        echo 'N/A';
+                      } 
                       ?>
                     </td>
                     <td style="display:none">
                       <?php 
-                      // if ($price && $price >= 0) {
-                      //   echo $price;
-                      // } else {
-                      //   echo 0;
-                      // } 
+                      if ($price && $price >= 0) {
+                        echo $price;
+                      } else {
+                        echo 0;
+                      } 
                       ?>
                     </td>
                     <td <?php echo (in_array('published', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
@@ -242,45 +242,14 @@ class GHAX_Shortcode_Manager
             jQuery(".lead-main-wrap").hide();
           }
           jQuery("a.added").each(function(){
-            jQuery(".lead-main-wrap .top-hdr-info ul").append("<li>" + jQuery(this).parents("tr").attr("name") + "</li>")
+            jQuery(".lead-main-wrap .top-hdr-info ul").append("<li><span class='name'>" + jQuery(this).parents("tr").attr("name") + "</span><span class='price'>$" + jQuery(this).parents("tr").attr("price") + "<span></li>")
           })
         </script>
         <script>
-          function sortTableById() {
-              var table, rows, switching, i, x, y, shouldSwitch;
-              table = document.getElementById("leadstbl");
-              switching = true;
-
-              // Loop to keep switching until no switching has been done
-              while (switching) {
-                  switching = false;
-                  rows = table.rows;
-
-                  // Loop through all table rows (except the headers)
-                  for (i = 1; i < (rows.length - 1); i++) {
-                      shouldSwitch = false;
-                      
-                      // Get the two elements to compare
-                      x = rows[i].getAttribute("id");
-                      y = rows[i + 1].getAttribute("id");
-
-                      // Compare the two rows
-                      if (parseInt(x.split("_")[1]) > parseInt(y.split("_")[1])) {
-                          shouldSwitch = true;
-                          break;
-                      }
-                  }
-                  if (shouldSwitch) {
-                      // If a switch is needed, perform the switch and mark that a switch has been done
-                      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                      switching = true;
-                  }
-              }
-          }
-
           // Call the sorting function after the page has loaded
           window.onload = function() {
-              sortTableById();
+              jQuery("#created_on").click();
+              jQuery("#created_on").click();
           };
         </script>
       <?php
@@ -1200,9 +1169,13 @@ class GHAX_Shortcode_Manager
           }
           $price[] = $lprice;
           $myemail = "";
+          $full_name = "";
           foreach ($person as $key1 => $value1) {
             if (filter_var($value1, FILTER_VALIDATE_EMAIL)) {
               $myemail = $value1;
+            }
+            if ($key1 == 'Name') {
+              $full_name = $value1;
             }
           }
 
@@ -1217,7 +1190,9 @@ class GHAX_Shortcode_Manager
             unset($leadcart[$key]);
           } else {
             $lead_email[] = ghax_obfuscate_email($myemail);
+            $lead_name[] = $full_name;
           }
+          $html_li[] = "<li><span class='name'>" . $full_name . "</span><span class='price'>$" . $lprice . "</span></li>";
         }
       }
       if ($sold) {
@@ -1226,10 +1201,12 @@ class GHAX_Shortcode_Manager
       if (empty($leadcart)) {
         return;
       }
+
+      echo '<div class="lead-main-wrap"><div class="top-hdr-info"><p style="font-weight:bold;;">You are requesting access to the following leads:</p>';
+      echo "<ul>" . implode($html_li) ."</ul>";
+
       $lprice = array_sum($price);
 
-      echo '<div class="lead-main-wrap"><div class="top-hdr-info"><p style="font-weight:bold;;">You are requesting access to the following lead:</p>';
-      echo "<ul><li>" . implode("</li><li>", $lead_email) . "</li></ul></div>";
       $user = wp_get_current_user();
       $udata = $user->data;
       /*$qry = "SELECT * FROM ".$wpdb->prefix."ghaxlt_leads WHERE id=".$_GET['lead'];
@@ -1248,10 +1225,13 @@ class GHAX_Shortcode_Manager
       }
       $paypal_s = false;
       $stripe_s = false;
+      $authorize_net_s = false;
       if (get_option('paypal_api_username') && get_option('paypal_api_password') && get_option('paypal_api_signature')) {
         $paypal_s = true;
       }
       if (get_option('authorize_api_login') && get_option('authorize_transaction_key') && get_option('authorize_signature_key')) {
+        require_once('authorizenet-php/autoload.php');
+
         $authorize_net_s = true;
       }
       if (get_option('stripe_publishable_key') && (get_option('stripe_secret_key'))) {
@@ -1490,19 +1470,19 @@ class GHAX_Shortcode_Manager
       }
 
       ?>
-      <!-- <div class="price">Price :<br>
-        <span>
-          <?php if ($lprice) {
+        <div class="price">
+          <span>
+            <?php if ($lprice) {
 
-            echo get_option('lead_currency') . $lprice;
-          } else {
+              echo get_option('lead_currency') . $lprice;
+            } else {
 
-            echo get_option('lead_currency') . '0.00';
-          } ?>
-        </span>
-      </div> -->
-
-      <div class="payment_options_container" style="<?php echo $display_data; ?>">
+              echo get_option('lead_currency') . '0.00';
+            } ?>
+          </span>
+        </div>
+      </div>
+      <!-- <div class="payment_options_container" style="<?php echo $display_data; ?>">
         <?php if (($paypal_s) && ($stripe_s)) { ?>
           <h4 class="paymentttl">Select a payment option:</h4>
         <?php } ?>
@@ -1514,8 +1494,13 @@ class GHAX_Shortcode_Manager
         }
         if ($stripe_s) { ?>
           <a class="paymentoptt" href="javascript:void(0);" id="stripeout">Stripe</a>
+        <?php
+        }
+        if ($authorize_net_s) { ?>
+          <a class="paymentoptt" href="javascript:void(0);" id="stripeout">Authorize.net</a>
         <?php } ?>
-      </div>
+        
+      </div> -->
 
       <div class="payment_options_form">
         <?php

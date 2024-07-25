@@ -179,11 +179,14 @@
   padding: 40px 20px 0 0;
 }
 
+#lead-purchase-checkout{
+  visibility: hidden;
+}
 .top-hdr-info {
   padding: 45px 20px;
   margin: 0 2% 10px 0;
   float: left;
-  width: 74%;
+  width: 100%;
   background: #333333;
   border-radius: 12px;
   color: #fff;
@@ -192,7 +195,27 @@
   margin: 0 0 0 15px;
   padding: 0;
   list-style: none;
-  float: left;
+  /* float: left; */
+  width: 70%;
+}
+.top-hdr-info .price{
+  width: 70%;
+  text-align: right;
+  margin-left: 15px;
+}
+.top-hdr-info li{
+  width: 100%;
+  display: inline-flex;
+  border-bottom: 1px dotted;
+  line-height: 2;
+}
+.top-hdr-info li .name {
+  width: 80%;
+  align-content: center;
+}
+.top-hdr-info li .price {
+  width: 20%;
+  align-content: center;
 }
 /* .price {
   padding: 25px 20px;
@@ -822,7 +845,7 @@ div#wp-buyer_note-editor-container {
   margin: 10px 0;
 }
 .top-hdr-info p {
-  float: left;
+  /* float: left; */
   margin: 0 !important;
 }
 
@@ -913,7 +936,7 @@ div#wp-buyer_note-editor-container {
   margin: 0 15px 0 0px;
 }
 #payment-form .form-group {
-  width: 31%;
+  width: 45%;
   float: left;
   margin: 0 18px 0 0px;
 }
@@ -1011,13 +1034,13 @@ div.dataTables_wrapper table.mdc-data-table__table thead tr th.sorting:after {
   color: #fff !important;
 }
 
-.lead-main-wrap .price {
+/* .lead-main-wrap .price {
   display: inline-block;
   background: #734a9d;
   color: #fff;
   padding: 25px;
   border-radius: 12px;
-}
+} */
 
 .payment_options_container a {
   text-decoration: none !important;

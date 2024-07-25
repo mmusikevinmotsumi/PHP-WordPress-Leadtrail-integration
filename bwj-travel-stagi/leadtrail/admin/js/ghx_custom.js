@@ -41,7 +41,7 @@
       },
       {
         orderable: false,
-        targets: [14],
+        targets: [3],
       },
     ],
   });

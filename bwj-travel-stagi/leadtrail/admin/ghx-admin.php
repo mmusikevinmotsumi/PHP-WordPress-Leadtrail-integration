@@ -839,6 +839,7 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
     $_leaddisplayall_page = get_option('_leaddisplayall_page');
     $multiple_lead = get_option('multiple_lead_show');
     $max_lead_purchase = get_option('max_lead_purchase');
+    $max_global_purchase = get_option('max_global_purchase');
     $_leaddetail_page = get_option('_leaddetail_page');
     $admin_lead_field_display = get_option('admin_lead_field_display');
     $lead_field_display = get_option('lead_field_display');
@@ -1187,48 +1188,6 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
                   </div>
                 </div>
               </div>
-              <div class="col-md-3">
-                <div class="form-group two">
-                  <label class="admin" style="float: none;position: absolute;margin-left: 30px;">Multiple lead Purchases</label>
-                  <div class="form-class">
-                    <input type="checkbox" name="multiple_lead" value="1" <?php if ($multiple_lead) {
-                                                                            echo "checked";
-                                                                          } ?>>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Maximum lead purchase per user</label>
-                  <div class="form-class">
-                    <input type="text" name="max_lead_purchase" value="<?php echo esc_attr($max_lead_purchase); ?>">
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="col-md-3">
-                <div class="form-group">
-                  <label>Currency</label>
-                  <div class="form-class">
-                    <select name="lead_currency">
-                      <option value="">-SELECT-</option>
-                      <option value="$" <?php if ($lead_currency == '$') {
-                                          echo "selected";
-                                        } ?>>USD</option>
-                      <option value="£" <?php if ($lead_currency == '£') {
-                                          echo "selected";
-                                        } ?>>Pounds sterling</option>
-                      <option value="€" <?php if ($lead_currency == '€') {
-                                          echo "selected";
-                                        } ?>>Euro</option>
-                      <option value="CAD $" <?php if ($lead_currency == 'CAD $') {
-                                              echo "selected";
-                                            } ?>>Canadian Dollars</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
       </div>
@@ -1237,6 +1196,56 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
         <h2>Buyer Details</h2>
 
         <div class="container">
+          <div class="row  form-inn">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label class="admin" style="float: none;position: absolute;margin-left: 30px;">Multiple lead Purchases</label>
+                <div class="form-class">
+                  <input type="checkbox" name="multiple_lead" value="1" <?php if ($multiple_lead) {
+                                                                          echo "checked";
+                                                                        } ?>>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>GLOBAL daily purchases</label>
+                <div class="form-class">
+                  <input type="text" name="max_global_purchase" value="<?php echo esc_attr($max_global_purchase); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>USER daily purchases</label>
+                <div class="form-class">
+                  <input type="text" name="max_lead_purchase" value="<?php echo esc_attr($max_lead_purchase); ?>">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Currency</label>
+                <div class="form-class">
+                  <select name="lead_currency">
+                    <option value="">-SELECT-</option>
+                    <option value="$" <?php if ($lead_currency == '$') {
+                                        echo "selected";
+                                      } ?>>USD</option>
+                    <option value="£" <?php if ($lead_currency == '£') {
+                                        echo "selected";
+                                      } ?>>Pounds sterling</option>
+                    <option value="€" <?php if ($lead_currency == '€') {
+                                        echo "selected";
+                                      } ?>>Euro</option>
+                    <option value="CAD $" <?php if ($lead_currency == 'CAD $') {
+                                            echo "selected";
+                                          } ?>>Canadian Dollars</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-md-3">
               <div class="form-group">
@@ -1321,7 +1330,7 @@ Andy,Smith,andy@yahoo.com,US,Houston,Texas,77027,1,Group 2,Category 2,Sales Qual
           <div class="row">
             <h3 class="pay">Paypal</h3>
             <div class="col-md-3">
-              <div class="form-group <?php echo esc_attr(get_option('stripe_mode')); ?>">
+              <div class="form-group <?php echo esc_attr(get_option('paypal_mode')); ?>">
                 <label>Mode</label>
                 <div class="form-class">
                   <select name="paypal_mode">

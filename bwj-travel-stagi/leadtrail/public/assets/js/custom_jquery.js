@@ -97,7 +97,7 @@ jQuery(document).ready(function ($) {
           $(".lead-main-wrap .top-hdr-info ul li").remove();
 
           $("a.added").each(function(){
-            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("name") + "</li>")
+            $(".lead-main-wrap .top-hdr-info ul").append("<li><span class='name'>" + $(this).parents("tr").attr("name") + "</span><span class='price'>$" + $(this).parents("tr").attr("price") + "</span></li>")
           })
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -146,29 +146,31 @@ jQuery(document).ready(function ($) {
   });
 
   $(document).on('click', '.confirmaddtocart', function (event) {
-    console.log("Run JavaScript - confirmaddtocart");
-    var $thisbutton = $(this);
-    if($("a.added").length>0){
-      $.ajax({
-        type: 'post',
-        url: ajax_script.ajaxurl,
-        data: { action: 'confirm_add_to_cart', nc: ajax_script.nc },
-        beforeSend: function (response) {
-          $thisbutton.addClass('loading');
-        },
-        complete: function (response) {
-          $thisbutton.removeClass('loading');
-        },
-        success: function (response) {
-          window.location.href = response.data.redirect_url
-        },
-        error: function() {
-          alert('There was an error processing your request. Please try again later.');
-        }
-      });
-    }
+    // console.log("Run JavaScript - confirmaddtocart");
+    // var $thisbutton = $(this);
+    // if($("a.added").length>0){
+    //   $.ajax({
+    //     type: 'post',
+    //     url: ajax_script.ajaxurl,
+    //     data: { action: 'confirm_add_to_cart', nc: ajax_script.nc },
+    //     beforeSend: function (response) {
+    //       $thisbutton.addClass('loading');
+    //     },
+    //     complete: function (response) {
+    //       $thisbutton.removeClass('loading');
+    //     },
+    //     success: function (response) {
+    //       window.location.href = response.data.redirect_url
+    //     },
+    //     error: function() {
+    //       alert('There was an error processing your request. Please try again later.');
+    //     }
+    //   });
+    // }
     
     event.preventDefault();
+    $("#lead-purchase-checkout a").click();
+
   });
 
   $('.directbuy').click(function (event) {

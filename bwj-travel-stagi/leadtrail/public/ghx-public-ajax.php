@@ -28,6 +28,8 @@ class GHAX_Public_Ajax
     $user_id = get_current_user_id();
     $leadcart = get_user_meta($user_id, 'leadcart', true);
     $max_lead_purchase = get_option('max_lead_purchase');
+    $max_global_purchase = get_option('max_global_purchase');
+    
 
 // 	echo "User ID: ".$user_id."\n";
     global $wpdb;
@@ -72,6 +74,13 @@ class GHAX_Public_Ajax
       $user_id, $current_date
     );
     $daily_count = count($wpdb->get_results($daily_query));
+
+    // Daily total count
+    $daily_total_query = $wpdb->prepare(
+      "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE DATE(`created_date`) = %s",
+      $current_date
+    );
+    $daily_total_count = count($wpdb->get_results($daily_total_query));
 		  	  
 // 	echo "Daily count: ".$daily_count."\n";
 	  

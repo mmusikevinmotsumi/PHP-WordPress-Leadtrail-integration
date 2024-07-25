@@ -304,6 +304,7 @@ class GHAX_Leadtrail_Handlers
       $_leadbuyerdashboard_page = sanitize_text_field($_POST['_leadbuyerdashboard_page']);
       $_leaddisplayall_page = sanitize_text_field($_POST['_leaddisplayall_page']);
       $max_lead_purchase = sanitize_text_field($_POST['max_lead_purchase']);
+      $max_global_purchase = sanitize_text_field($_POST['max_global_purchase']);
       $daily_limit_annual = sanitize_text_field($_POST['daily_limit_annual']);
       $monthly_limit_annual = sanitize_text_field($_POST['monthly_limit_annual']);
       $yearly_limit_annual = sanitize_text_field($_POST['yearly_limit_annual']);
@@ -359,6 +360,7 @@ class GHAX_Leadtrail_Handlers
       update_option('_leaddisplayall_page', $_leaddisplayall_page);
       update_option('multiple_lead_show', $multiple_lead);
       update_option('max_lead_purchase', $max_lead_purchase);
+      update_option('max_global_purchase', $max_global_purchase);
       update_option('_leaddetail_page', $_leaddetail_page);
       update_option('admin_lead_field_display', $admin_lead_field_display);
       update_option('lead_field_display', $lead_field_display);
