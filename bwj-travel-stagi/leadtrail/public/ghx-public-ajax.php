@@ -106,20 +106,20 @@ class GHAX_Public_Ajax
     $id = array((int) $_POST['id']);
     if ($leadcart) {
 // 		echo "Cart count: ".count($leadcart)."\n";
-      if (count($leadcart) >= $max_lead_purchase) {
-        echo "You may only request " . (int) $max_lead_purchase . " leads at a time";
+      // if (count($leadcart) >= $max_lead_purchase) {
+      //   echo "You may only request " . (int) $max_lead_purchase . " leads at a time";
+      //   die();
+      // }
+      if (count($leadcart) + $daily_count > $daily_limit + $max_lead_purchase) {
+        echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." free lead and " . (int) $max_lead_purchase . " leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
         die();
       }
-      else if (count($leadcart) + $daily_count > $daily_limit) {
-        echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
+      else if (count($leadcart) + $monthly_count > $monthly_limit + $max_lead_purchase) {
+        echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." free lead and " . (int) $max_lead_purchase . " leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
         die();
       }
-      else if (count($leadcart) + $monthly_count > $monthly_limit) {
-        echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
-        die();
-      }
-      else if (count($leadcart) + $yearly_count > $yearly_limit) {
-        echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
+      else if (count($leadcart) + $yearly_count > $yearly_limit + $max_lead_purchase) {
+        echo "Your membership allows access to a total of:\n" . (int) $daily_limit ." free lead and " . (int) $max_lead_purchase . " leads per day\n". (int) $monthly_limit ." leads per month\n". (int) $yearly_limit ." leads per year";
         die();
       }
       else {

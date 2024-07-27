@@ -53,14 +53,11 @@ function leadsearch() {
 }
 jQuery(document).ready(function ($) {
   $('#leadstbl').DataTable({
+    ordering: false,
     columnDefs: [
       {
         targets: ['_all'],
         className: 'mdc-data-table__cell',
-      },
-      {
-        orderable: false,
-        targets: [3],
       },
     ],
     searchPlaceholder: 'Search',
@@ -99,6 +96,12 @@ jQuery(document).ready(function ($) {
           $("a.added").each(function(){
             $(".lead-main-wrap .top-hdr-info ul").append("<li><span class='name'>" + $(this).parents("tr").attr("name") + "</span><span class='price'>$" + $(this).parents("tr").attr("price") + "</span></li>")
           })
+
+          // Remove "Free" text
+
+          $("#leadstbl span.price").css("text-decoration", "none");
+          $("#leadstbl span.free").css("display", "none")
+
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       },
@@ -132,6 +135,8 @@ jQuery(document).ready(function ($) {
         $(".lead-main-wrap .top-hdr-info ul li").remove();
         if($("a.added").length<1){
           $(".lead-main-wrap").hide();
+          $("#leadstbl span.price").css("text-decoration", "line-through");
+          $("#leadstbl span.free").css("display", "block")
         }
         else{
           $("a.added").each(function(){

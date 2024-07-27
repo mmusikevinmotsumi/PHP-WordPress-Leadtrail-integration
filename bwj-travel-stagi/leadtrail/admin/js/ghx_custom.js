@@ -4,6 +4,7 @@
   var table = $('#leadstbl').DataTable({
     autoWidth: false,
     stateSave: true,
+    ordering: false,
     stateSaveCallback: function (settings, data) {
       localStorage.setItem(
         'DataTables_' + settings.sInstance,
@@ -38,10 +39,6 @@
       {
         targets: ['_all'],
         className: 'mdc-data-table__cell',
-      },
-      {
-        orderable: false,
-        targets: [3],
       },
     ],
   });

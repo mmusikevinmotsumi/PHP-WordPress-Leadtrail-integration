@@ -81,8 +81,10 @@
   margin-bottom: 20px;
 }
 
-#card-element {
+#anet-form #card-element {
   margin-top: 20px;
+  background-color: #e5e5e5;
+  display: flex;
 }
 
 .psuccess {
@@ -97,7 +99,8 @@
 }
 
 .stripebtn,
-.paypalbtn {
+.paypalbtn,
+.anetbtn {
   color: #fff !important;
   background: #000 !important;
   padding: 8px 15px !important;
@@ -111,6 +114,14 @@
 
 .ghax_stripe_form input[type='text'],
 .ghax_stripe_form input[type='email'] {
+  border: none;
+  line-height: 1;
+  padding: 14px 16px;
+  background: #e5e5e5;
+  width: 100%;
+}
+.ghax_anet_form input[type='text'],
+.ghax_anet_form input[type='email'] {
   border: none;
   line-height: 1;
   padding: 14px 16px;
@@ -935,13 +946,13 @@ div#wp-buyer_note-editor-container {
 .maindiv input.sel {
   margin: 0 15px 0 0px;
 }
-#payment-form .form-group {
+#payment-form .form-group, #anet-form .form-group{
   width: 45%;
   float: left;
   margin: 0 18px 0 0px;
 }
 
-#payment-form label {
+#payment-form label, #anet-form label{
   font-size: 16px;
   color: #000;
   font-weight: 600;
@@ -950,20 +961,29 @@ div#wp-buyer_note-editor-container {
   width: 100%;
 }
 
-#payment-form input {
+#payment-form input, #anet-form input {
   border: none !important;
-  background: #f3f3f3 !important;
 }
+#anet-form #card-number{
+  width: 70%;
+}
+#anet-form #expiry-date-mm{
+  width: 10%;
+}
+#anet-form #expiry-date-yy{
+  width: 10%;
+}
+#anet-form #card-code{
+  width: 10%;
+}
+
 .CardField.CardField--ltr {
   background: #f3f3f3 !important;
 }
 .price span {
   font-style: normal;
   font-weight: 600;
-  font-size: 36px;
-  line-height: 36px;
   letter-spacing: 0.005em;
-  color: #ffffff;
 }
 
 a#leadstbl_previous {

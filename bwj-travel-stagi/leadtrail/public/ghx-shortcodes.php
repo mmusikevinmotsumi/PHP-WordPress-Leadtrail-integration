@@ -1,6 +1,8 @@
 <?php
 
 require_once GHAX_LEADTRAIL_ABSPATH . 'includes/function/functions.php';
+use net\authorize\api\contract\v1 as AnetAPI;
+use net\authorize\api\controller as AnetController;
 
 class GHAX_Shortcode_Manager
 {
@@ -102,7 +104,7 @@ class GHAX_Shortcode_Manager
                 <th <?php echo (in_array('price', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Price</th>
                 <th style="display:none"></th>
                 <th <?php echo (in_array('published', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Published</th>
-                <th id="created_on" class="sorting_disabled" <?php echo (in_array('created', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Created On</th>
+                <th id="created_on" <?php echo (in_array('created', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Created On</th>
                 <th>Access Lead</th>
               </thead>
               <tbody>
@@ -163,24 +165,75 @@ class GHAX_Shortcode_Manager
                     <td <?php echo (in_array('zipcode', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($zipcode); ?></td>
                     <td <?php echo (in_array('price', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
                       <?php
-                      if ($price) {
-                        if ($result->discount_quantity) {
-                          if ($result->lead_discount) {
-                            if ($result->buylead >= $result->discount_quantity) {
-                              $discount_multi = floor($result->buylead / $result->discount_quantity);
-                              echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
-                              $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
-                              if ($price <= 0) {
-                                $price = 0;
+
+                        $current_date = current_time('Y-m-d');
+                        $user_id = get_current_user_id();
+                        $daily_query = $wpdb->prepare(
+                          "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
+                          $user_id, $current_date
+                        );
+                        $daily_count = count($wpdb->get_results($daily_query));
+                    
+                        $leadcart = get_user_meta($user_id, 'leadcart', true);
+                        if (!in_array($result->id, $leadcart) && $daily_count==0) {
+                        ?>
+                        <span class='price' style="text-decoration: line-through;">
+                          <?php
+                                                        
+                          if ($price) {
+                            if ($result->discount_quantity) {
+                              if ($result->lead_discount) {
+                                if ($result->buylead >= $result->discount_quantity) {
+                                  $discount_multi = floor($result->buylead / $result->discount_quantity);
+                                  echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
+                                  $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
+                                  if ($price <= 0) {
+                                    $price = 0;
+                                  }
+                                }
                               }
                             }
-                          }
+                            echo esc_html(get_option('lead_currency') . $price);
+                          } else {
+                            echo 'N/A';
+                          } 
+                          ?>
+                        </span>
+                        <span class='free'>
+                          FREE
+                        </span>
+                      <?php
                         }
-                        echo esc_html(get_option('lead_currency') . $price);
-                      } else {
-                        echo 'N/A';
-                      } 
-                      ?>
+                        else{
+                        ?>
+                        <span class='price'>
+                          <?php
+                                                        
+                          if ($price) {
+                            if ($result->discount_quantity) {
+                              if ($result->lead_discount) {
+                                if ($result->buylead >= $result->discount_quantity) {
+                                  $discount_multi = floor($result->buylead / $result->discount_quantity);
+                                  echo "<del>" . esc_html(get_option('lead_currency') . $price) . "</del> ";
+                                  $price = $price - ((($result->lead_discount * $price) / 100) * $discount_multi);
+                                  if ($price <= 0) {
+                                    $price = 0;
+                                  }
+                                }
+                              }
+                            }
+                            echo esc_html(get_option('lead_currency') . $price);
+                          } else {
+                            echo 'N/A';
+                          } 
+                          ?>
+                        </span>
+                        <span class='free' style="display: none;">
+                          FREE
+                        </span>
+                      <?php
+                        }
+                        ?>
                     </td>
                     <td style="display:none">
                       <?php 
@@ -248,8 +301,8 @@ class GHAX_Shortcode_Manager
         <script>
           // Call the sorting function after the page has loaded
           window.onload = function() {
-              jQuery("#created_on").click();
-              jQuery("#created_on").click();
+              // jQuery("#created_on").click();
+              // jQuery("#created_on").click();
           };
         </script>
       <?php
@@ -1117,6 +1170,7 @@ class GHAX_Shortcode_Manager
     $display_data = "";
 
     $user_id = get_current_user_id();
+    $current_date = current_time('Y-m-d');
     $leadcart = get_user_meta($user_id, 'leadcart', true);
     $price = array();
     $lead_email = array();
@@ -1167,6 +1221,17 @@ class GHAX_Shortcode_Manager
           } else {
             $lprice = 0;
           }
+
+          $daily_query = $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
+            $user_id, $current_date
+          );
+          $daily_count = count($wpdb->get_results($daily_query));
+
+          // if ($daily_count == 0){
+          //   $lprice = 0;
+          // }
+
           $price[] = $lprice;
           $myemail = "";
           $full_name = "";
@@ -1210,7 +1275,7 @@ class GHAX_Shortcode_Manager
       $user = wp_get_current_user();
       $udata = $user->data;
       /*$qry = "SELECT * FROM ".$wpdb->prefix."ghaxlt_leads WHERE id=".$_GET['lead'];
-		$data = $wpdb->get_row($qry);*/
+		  $data = $wpdb->get_row($qry);*/
       $curarr = array(
         '$' => 'usd',
         '£' => 'gbp',
@@ -1241,11 +1306,138 @@ class GHAX_Shortcode_Manager
         );
         $stripe_s = true;
       }
-      // Set your secret key. Remember to switch to your live secret key in production.
-      // See your keys here: https://dashboard.stripe.com/apikeys
+      if (isset($_POST['anetbtn'])) {
+        require_once('authorizenet-php/autoload.php');
+        // require("ANetPayment.php");
 
-      // Token is created using Stripe Checkout or Elements!
-      // Get the payment token ID submitted by the form:
+        $display_data = "display:none";
+        $anet_first_name = sanitize_text_field($_POST['anet_first_name']);
+        $anet_last_name = sanitize_text_field($_POST['anet_last_name']);
+        $anet_email = sanitize_email($_POST['anet_email']);
+        $cardId = sanitize_text_field($_POST['cardId']);
+        $card_exp_mm = sanitize_text_field($_POST['expiry-date-mm']);
+        $card_exp_yy = sanitize_text_field($_POST['expiry-date-yy']);
+        $card_code = sanitize_text_field($_POST['card-code']);
+        $lead_price = number_format((sanitize_text_field($_POST['lead_price']) * 100), 0, '', '');
+        $currency = 'usd';
+        $amount = sanitize_text_field($_POST['lead_price']);
+
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName(get_option('authorize_api_login'));
+        $merchantAuthentication->setTransactionKey(get_option('authorize_transaction_key'));
+
+        // Set the transaction's refId
+        $refId = 'ref' . time();
+
+        // Create the payment data for a credit card
+        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard->setCardNumber($cardId);
+        $creditCard->setExpirationDate("20".$card_exp_yy."-".$card_exp_mm);
+        $creditCard->setCardCode($card_code);
+
+        // Add the payment data to a paymentType object
+        $paymentOne = new AnetAPI\PaymentType();
+        $paymentOne->setCreditCard($creditCard);
+        
+        // Set the customer's Bill To address
+        $customerAddress = new AnetAPI\CustomerAddressType();
+        $customerAddress->setFirstName($anet_first_name);
+        $customerAddress->setLastName($anet_last_name);
+
+        // Set the customer's identifying information
+        $customerData = new AnetAPI\CustomerDataType();
+        $customerData->setEmail($anet_email);
+
+        $transactionRequestType = new AnetAPI\TransactionRequestType();
+        $transactionRequestType->setTransactionType("authCaptureTransaction"); 
+        $transactionRequestType->setAmount($amount);
+        $transactionRequestType->setPayment($paymentOne);
+        $transactionRequestType->setBillTo($customerAddress);
+        $transactionRequestType->setCustomer($customerData);
+
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequestType);
+
+        $controller = new AnetController\CreateTransactionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+
+        // if ($charge->status == 'succeeded') {
+        if ($response != null) {
+          if ($response->getMessages()->getResultCode() == "Ok") {
+            $tresponse = $response->getTransactionResponse();
+            echo '<p class="psuccess">Payment has processed successfully. Redirecting you to your dashboard...<p>';
+            $j = 0;
+            foreach ($leadcart as $key => $value) {
+              $wpdb->insert(
+                $wpdb->prefix . "ghaxlt_leads_payments",
+                array(
+                  'user_id' => get_current_user_id(),
+                  'lead_id' => $value,
+                  'payment_by' => 'authorize.net',
+                  'amount' => $price[$j],
+                  'payment_id' => $tresponse->getTransId(),
+                  'transaction_type' => $this->payment_mode,
+                )
+              );
+              $wpdb->update($wpdb->prefix . "ghaxlt_leads", array('status' => 'sold'), array('id' => $value));
+              $j++;
+            }
+
+            update_user_meta($user_id, 'leadcart', "");
+
+            $red = get_permalink(get_option('_leadbuyerdashboard_page'));
+            $author_obj = get_user_by('id', $user_id);
+
+            $to = $author_obj->user_email;
+
+            $subject = 'You purchased a new lead';
+
+            $headers = "From: " . strip_tags(get_option('admin_email')) . "\r\n";
+            $headers .= "Reply-To: " . strip_tags(get_option('admin_email')) . "\r\n";
+            $headers .= "MIME-Version: 1.0\r\n";
+            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            $message = '<html><body>';
+            $message .= '<div class="emailcontainer" style="border:2px solid #74499E;">';
+            $message .= '<div class="emailcontent" style="background:#fff;padding:2%;">';
+            $message .= '<p>You purchased ' . $j . ' leads for ' . get_option('lead_currency') . '' . sanitize_text_field($_POST['lead_price']) . '. You can view your lead details on the <a href="' . $red . '">buyer dashboard</a> </p>';
+            $message .= '</div>';
+            $message .= '</div>';
+            $message .= '</body></html>';
+
+            wp_mail($to, $subject, $message, $headers);
+
+            $to1 = get_option('admin_email');
+            $subject1 = 'You sold a lead';
+            $headers1 = "From: " . strip_tags($author_obj->user_email) . "\r\n";
+            $headers1 .= "Reply-To: " . strip_tags($author_obj->user_email) . "\r\n";
+            $headers1 .= "MIME-Version: 1.0\r\n";
+            $headers1 .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            $message1 = '<html><body>';
+            $message1 .= '<div class="emailcontainer" style="border:2px solid #74499E;">';
+            $message1 .= '<div class="emailcontent" style="background:#fff;padding:2%;">';
+            $message1 .= '<p>' . $author_obj->user_login . ' purchased ' . $j . ' leads for ' . get_option('lead_currency') . '' . sanitize_text_field($_POST['lead_price']) . '. Go to your <a href="' . home_url('/wp-admin') . '">admin dashboard.</a> </p>';
+            $message1 .= '</div>';
+            $message1 .= '</div>';
+            $message1 .= '</body></html>';
+
+            wp_mail($to1, $subject1, $message1, $headers1);
+          }
+        ?>
+          <script>
+            setTimeout(function() {
+              window.location.href = '<?php echo $red; ?>'; // the redirect goes here
+
+            }, 5000);
+          </script>
+        <?php
+
+        } else {
+          echo '<p class="perror">Payment is pending.</p>';
+        }
+      }
       if (isset($_POST['stripeToken'])) {
         $token = sanitize_text_field($_POST['stripeToken']);
         $display_data = "display:none";
@@ -1593,10 +1785,49 @@ class GHAX_Shortcode_Manager
               <button class="stripebtn">Submit Payment</button>
             </form>
           </div>
-        <?php } ?>
+        <?php } 
+        if (get_option('authorize_api_login') && (get_option('authorize_transaction_key'))) { ?>
+          <div class="ghax_anet_form" <?php if (($paypal_s) && ($stripe_s)) { ?> style="display:none" <?php } ?>>
+
+            <form action="" method="post" id="anet-form">
+              <div class="form-row">
+                <h5>Personal Details</h5>
+                <div class="form-group">
+                  <label>First Name</label>
+                  <input type="text" name="anet_first_name" value="" id="anet_first_name" placeholder="Enter First Name" required>
+                </div>
+                <div class="form-group">
+                  <label>Last Name</label>
+                  <input type="text" name="anet_last_name" value="" id="anet_last_name" placeholder="Enter Last Name" required>
+                </div>
+                <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" name="anet_email" value="<?php echo $udata->user_email; ?>" id="anet_email" placeholder="Enter Email Address" required>
+                </div>
+                <h5>Credit card information</h5>
+                <div id="card-element">
+                    <input type="text" name="cardId" id="card-number" placeholder="Card Number" data-attr="cardNumber" pattern="\d*" required>
+                    <input type="text" name="expiry-date-mm" id="expiry-date-mm" placeholder="MM" data-attr="expDate" pattern="\d{2}" maxlength="2" required>
+                    <input type="text" name="expiry-date-yy" id="expiry-date-yy" placeholder="YY" data-attr="expDate" pattern="\d{2}" maxlength="2" required>
+                    <input type="text" name="card-code" id="card-code" placeholder="CVV" data-attr="cardCode" pattern="\d{3}" maxlength="3" required>
+                </div>
+
+                <!-- Used to display Element errors. -->
+                <div id="card-errors" role="alert"></div>
+              </div>
+
+              <input type="hidden" name="lead_price" value="<?php if ($lprice) {
+                                                              echo $lprice;
+                                                            } else {
+                                                              echo '0.00';
+                                                            } ?>">
+              <button class="anetbtn" name="anetbtn">Submit Payment</button>
+            </form>
+          </div>
+        <?php }?>
       </div>
       </div>
-      <script src="https://js.stripe.com/v3/"></script>
+      <!-- <script src="https://js.stripe.com/v3/"></script>
       <script>
         var stripe = Stripe('<?php echo get_option('stripe_publishable_key'); ?>');
 
@@ -1693,7 +1924,7 @@ class GHAX_Shortcode_Manager
             $('.ghax_stripe_form').show();
           });
         });
-      </script>
+      </script> -->
     <?php
     } else {
       echo "No Lead is added into cart";
