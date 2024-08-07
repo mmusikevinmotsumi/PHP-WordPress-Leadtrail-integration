@@ -73,14 +73,20 @@ jQuery(document).ready(function ($) {
       data: { action: 'lead_add_to_cart', id: id, nc: ajax_script.nc },
       beforeSend: function (response) {
         $thisbutton.removeClass('added').addClass('loading');
+        $(".buyleadbtn").css("pointer-events","none");
+        $("#loading-animation").show();
       },
       complete: function (response) {
         $thisbutton.addClass('added').removeClass('loading');
+        $("#loading-animation").hide();
       },
       success: function (response) {
         if (response) {
           alert(response);
+          $(".buyleadbtn").css("pointer-events", "auto");
         } else {
+          console.log("leadaddtocart: success");
+          $(".buyleadbtn").css("pointer-events", "auto");
           $thisbutton
             .parent()
             .html(
@@ -88,21 +94,8 @@ jQuery(document).ready(function ($) {
                 id +
                 '">Remove</a>'
             );
-          console.log($(".lead-main-wrap .top-hdr-info ul li").length);
-          console.log($("a.added").length);
-          $(".lead-main-wrap").show();
-          $(".lead-main-wrap .top-hdr-info ul li").remove();
-
-          $("a.added").each(function(){
-            $(".lead-main-wrap .top-hdr-info ul").append("<li><span class='name'>" + $(this).parents("tr").attr("name") + "</span><span class='price'>$" + $(this).parents("tr").attr("price") + "</span></li>")
-          })
-
-          // Remove "Free" text
-
-          $("#leadstbl span.price").css("text-decoration", "none");
-          $("#leadstbl span.free").css("display", "none")
-
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          $(this).parents("tr").addClass("added");
+          window.location.href = window.location.href;
         }
       },
     });
@@ -119,11 +112,16 @@ jQuery(document).ready(function ($) {
       data: { action: 'lead_remove_cart', id: id, nc: ajax_script.nc },
       beforeSend: function (response) {
         $thisbutton.addClass('loading');
+        $(".buyleadbtn").css("pointer-events","none");
+        $("#loading-animation").show();
       },
       complete: function (response) {
         $thisbutton.removeClass('loading');
+        $("#loading-animation").show();
       },
       success: function (response) {
+        console.log("remove_cart: success");
+        $(".buyleadbtn").css("pointer-events", "auto");
         $thisbutton
           .parent()
           .html(
@@ -132,18 +130,7 @@ jQuery(document).ready(function ($) {
               '">Get Access</a> '
           );
         $(this).parents("tr").removeClass("added");
-        $(".lead-main-wrap .top-hdr-info ul li").remove();
-        if($("a.added").length<1){
-          $(".lead-main-wrap").hide();
-          $("#leadstbl span.price").css("text-decoration", "line-through");
-          $("#leadstbl span.free").css("display", "block")
-        }
-        else{
-          $("a.added").each(function(){
-            $(".lead-main-wrap .top-hdr-info ul").append("<li>" + $(this).parents("tr").attr("name") + "</li>")
-          })
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.location.href = window.location.href;
       },
     });
     
@@ -151,31 +138,42 @@ jQuery(document).ready(function ($) {
   });
 
   $(document).on('click', '.confirmaddtocart', function (event) {
-    // console.log("Run JavaScript - confirmaddtocart");
-    // var $thisbutton = $(this);
-    // if($("a.added").length>0){
-    //   $.ajax({
-    //     type: 'post',
-    //     url: ajax_script.ajaxurl,
-    //     data: { action: 'confirm_add_to_cart', nc: ajax_script.nc },
-    //     beforeSend: function (response) {
-    //       $thisbutton.addClass('loading');
-    //     },
-    //     complete: function (response) {
-    //       $thisbutton.removeClass('loading');
-    //     },
-    //     success: function (response) {
-    //       window.location.href = response.data.redirect_url
-    //     },
-    //     error: function() {
-    //       alert('There was an error processing your request. Please try again later.');
-    //     }
-    //   });
-    // }
-    
     event.preventDefault();
-    $("#lead-purchase-checkout a").click();
-
+    console.log("Run JavaScript - confirmaddtocart");
+    var $thisbutton = $(this);
+    if ($thisbutton.hasClass("daily-count-0")){
+      if($("a.added").length>0){
+        $.ajax({
+          type: 'post',
+          url: ajax_script.ajaxurl,
+          data: { action: 'confirm_add_to_cart', nc: ajax_script.nc },
+          beforeSend: function (response) {
+            $thisbutton.addClass('loading');
+            $(".buyleadbtn").css("pointer-events","none");
+            $("#loading-animation").show();
+          },
+          complete: function (response) {
+            $thisbutton.removeClass('loading');
+            $("#loading-animation").hide();
+          },
+          success: function (response) {
+            $(".buyleadbtn").css("pointer-events", "auto");
+            if (response.data.redirect_url) {
+              window.location.href = response.data.redirect_url;
+            }
+          },
+          error: function() {
+            alert('There was an error processing your request. Please try again later.');
+          }
+        });
+      }
+      else{
+        alert("Please select 1 lead and try again.")
+      }
+    }
+    else{
+      $("#lead-purchase-checkout a").click();
+    }
   });
 
   $('.directbuy').click(function (event) {
@@ -190,6 +188,32 @@ jQuery(document).ready(function ($) {
       },
     });
     event.preventDefault();
+  });
+
+  $('.clear-cart').click(function (event) {
+    event.preventDefault();
+    var id = $(this).parent('li').attr('data-id');
+    if (jQuery(".remove_cart[data-id='" + id + "']").length){
+      jQuery(".remove_cart[data-id='" + id + "']").click();
+    }
+    else{
+      $.ajax({
+        type: 'post',
+        url: ajax_script.ajaxurl,
+        data: { action: 'lead_remove_cart', id: id, nc: ajax_script.nc },
+        beforeSend: function (response) {
+          $(".buyleadbtn").css("pointer-events","none")
+        },
+        complete: function (response) {
+        },
+        success: function (response) {
+          console.log("remove_cart: success: ", id);
+          $(".buyleadbtn").css("pointer-events", "auto");
+          window.location.href = window.location.href;
+        },
+      });
+      
+    }
   });
 });
 

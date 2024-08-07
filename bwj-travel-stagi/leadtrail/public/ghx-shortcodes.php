@@ -1,6 +1,7 @@
 <?php
 
 require_once GHAX_LEADTRAIL_ABSPATH . 'includes/function/functions.php';
+
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
 
@@ -53,9 +54,91 @@ class GHAX_Shortcode_Manager
       // print_r($results);
       // exit();
       //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}ghaxlt_leads WHERE `publish`=1  order by id desc");
+      $current_date = current_time('Y-m-d');
+      $user_id = get_current_user_id();
+      $daily_query = $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments 
+          WHERE `user_id` = %d 
+          AND DATE(`created_date`) = %s",
+        $user_id,
+        $current_date
+      );
+      $daily_count = count($wpdb->get_results($daily_query));
+
+      // Monthly count
+      $monthly_query = $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments 
+        WHERE `user_id` = %d 
+        AND YEAR(`created_date`) = YEAR(%s) 
+        AND MONTH(`created_date`) = MONTH(%s) 
+        AND `amount` = 0",
+        $user_id,
+        $current_date,
+        $current_date
+      );
+      $monthly_count = count($wpdb->get_results($monthly_query));
+
+      // 	echo "Monthly count: ".$monthly_count."\n";
+
+      // Yearly count
+      $yearly_query = $wpdb->prepare(
+        "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments 
+        WHERE `user_id` = %d 
+        AND YEAR(`created_date`) = YEAR(%s) 
+        AND `amount` = 0",
+        $user_id,
+        $current_date
+      );
+      $yearly_count = count($wpdb->get_results($yearly_query));
+
+      $leadcart = get_user_meta($user_id, 'leadcart', true);
+
+      if ($leadcart) {
+        if (count($leadcart) > 1) {
+          update_user_meta($user_id, 'leadcart', "");
+        }
+        foreach ($leadcart as $key => $value) {
+          $compare = 0;
+          foreach ($results as $result) {
+            if ($result->buylead >= $result->new_lead_quantity) {
+              continue;
+            }
+            if ($result->id == $value){
+              $compare = 1;
+            }
+          }
+          if ($compare == 0){
+            update_user_meta($user_id, 'leadcart', "");
+          }
+        }
+      }
+
+      $user_info = get_userdata($user_id);
+
+      if ($user_info) {
+        $user_roles = $user_info->roles;
+        // echo 'User roles: ' . implode(', ', $user_roles);
+        if (strpos(implode(', ', $user_roles), 'ghaxlt_annual_buyer') !== false) {
+          $daily_limit = get_option('daily_limit_annual');
+          $monthly_limit = get_option('monthly_limit_annual');
+          $yearly_limit = get_option('yearly_limit_annual');
+        }
+        if (strpos(implode(', ', $user_roles), 'ghaxlt_monthly_buyer') !== false) {
+          $daily_limit = get_option('daily_limit_monthly');
+          $monthly_limit = get_option('monthly_limit_monthly');
+          $yearly_limit = get_option('yearly_limit_monthly');
+        }
+        if (strpos(implode(', ', $user_roles), 'administrator') !== false) {
+          $daily_limit = 9999;
+          $monthly_limit = 9999;
+          $yearly_limit = 9999;
+        }
+      } else {
+        echo 'User not found.';
+      }
 
       if (count($results) > 0) {
-    ?>
+?>
 
         <div class="container">
           <div class="leadssrt">
@@ -67,26 +150,45 @@ class GHAX_Shortcode_Manager
             }  ?>
             <?php
             $style = 'style="display:none"'; ?>
-            <?php 
-                $multiple_lead = get_option('multiple_lead_show', false);
-                                       
-                if ($multiple_lead) { ?>
-                  <div class="lead-main-wrap" style="display:none;">
-                    <div class="top-hdr-info">
-                      <p style="font-weight:bold;;">You are requesting access to the following leads:</p>
-                      <ul>                        
-                      </ul>
-                    </div>
-                    <div class="float-end text-end mt-4 mb-4">
-                      <div class="form-holder">
-                        <div class="cart-btn-top">
-                          <a class="buyleadbtn confirmaddtocart"  href="javascript:void(0)">Confirm</a>
-                        </div>
-                      </div>
+            <?php
+            $multiple_lead = get_option('multiple_lead_show', false);
+
+            if ($multiple_lead) { ?>
+              <div class="lead-main-wrap">
+                <div class="top-hdr-info">
+                  <p <?php if (strpos(implode(', ', $user_roles), 'ghaxlt_monthly_buyer') !== false) {
+                        echo "style='display:none;'";
+                      } ?>>Complimentary Lead Redemptions Available<br>
+                    Daily: <?php echo $daily_limit - $daily_count > 0 ? $daily_limit - $daily_count : 0 ?> <br>
+                    Monthly: <?php echo $monthly_limit - $monthly_count > 0 ? $monthly_limit - $monthly_count : 0 ?><br>
+                    Annually: <?php echo $yearly_limit - $yearly_count > 0 ? $yearly_limit - $yearly_count : 0 ?><br>
+                  </p><br>
+                  <p class="request-note" style="display:none;">You are requesting access to this lead.</p>
+                  <ul>
+                  </ul>
+                </div>
+                <div class="float-end text-end mt-4 mb-4">
+                  <div class="form-holder">
+                    <div class="cart-btn-top">
+                      <a class="buyleadbtn confirmaddtocart daily-count-<?php echo $daily_count ?>" href="javascript:void(0)">Confirm</a>
                     </div>
                   </div>
-                <?php } ?>
-            <table id="leadstbl" style="width:100%;" class="table table-bordered">
+                </div>
+              </div>
+            <?php } ?>
+            <table id="leadstbl" style="width:100%;" class="table table-bordered" daily-count="<?php echo $daily_count ?>" cart-count="<?php
+                                                                                                                                        if (!empty($leadcart)) {
+                                                                                                                                          echo count($leadcart);
+                                                                                                                                        } else {
+                                                                                                                                          echo 0;
+                                                                                                                                        }
+                                                                                                                                        ?>" cart="<?php
+                                                                                                                                                  if (!empty($leadcart) && count($leadcart) > 0) {
+                                                                                                                                                    foreach ($leadcart as $key => $value) {
+                                                                                                                                                      echo ' ' . $value;
+                                                                                                                                                    }
+                                                                                                                                                  }
+                                                                                                                                                  ?>">
               <thead>
                 <th <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Email</th>
                 <th <?php echo (in_array('full_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>>Name</th>
@@ -149,7 +251,7 @@ class GHAX_Shortcode_Manager
                   $price = $result->totalprice;
                 ?>
 
-                  <tr id="delete_<?php echo esc_attr($result->id); ?>" name="<?php echo $full_name;?>" price="<?php echo $price;?>">
+                  <tr id="delete_<?php echo esc_attr($result->id); ?>" name="<?php echo $full_name; ?>" price="<?php echo $price; ?>">
                     <td <?php echo (in_array('email', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ghax_obfuscate_email($myemail); ?></td>
                     <td <?php echo (in_array('full_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo esc_html($full_name); ?></td>
                     <td <?php echo (in_array('from_name', $lead_field_display)) ? '' : 'style="display:none"'; ?>><?php echo ($result->form_name) ? esc_html($result->form_name) : 'N/A'; ?></td>
@@ -166,20 +268,21 @@ class GHAX_Shortcode_Manager
                     <td <?php echo (in_array('price', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
                       <?php
 
-                        $current_date = current_time('Y-m-d');
-                        $user_id = get_current_user_id();
-                        $daily_query = $wpdb->prepare(
-                          "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
-                          $user_id, $current_date
-                        );
-                        $daily_count = count($wpdb->get_results($daily_query));
-                    
-                        $leadcart = get_user_meta($user_id, 'leadcart', true);
-                        if (!in_array($result->id, $leadcart) && $daily_count==0) {
-                        ?>
+                      $current_date = current_time('Y-m-d');
+                      $user_id = get_current_user_id();
+                      $daily_query = $wpdb->prepare(
+                        "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
+                        $user_id,
+                        $current_date
+                      );
+                      $daily_count = count($wpdb->get_results($daily_query));
+
+                      $leadcart = get_user_meta($user_id, 'leadcart', true);
+                      if (empty($leadcart) && $daily_count == 0) {
+                      ?>
                         <span class='price' style="text-decoration: line-through;">
                           <?php
-                                                        
+
                           if ($price) {
                             if ($result->discount_quantity) {
                               if ($result->lead_discount) {
@@ -196,19 +299,18 @@ class GHAX_Shortcode_Manager
                             echo esc_html(get_option('lead_currency') . $price);
                           } else {
                             echo 'N/A';
-                          } 
+                          }
                           ?>
                         </span>
                         <span class='free'>
                           FREE
                         </span>
                       <?php
-                        }
-                        else{
-                        ?>
+                      } else {
+                      ?>
                         <span class='price'>
                           <?php
-                                                        
+
                           if ($price) {
                             if ($result->discount_quantity) {
                               if ($result->lead_discount) {
@@ -225,23 +327,23 @@ class GHAX_Shortcode_Manager
                             echo esc_html(get_option('lead_currency') . $price);
                           } else {
                             echo 'N/A';
-                          } 
+                          }
                           ?>
                         </span>
                         <span class='free' style="display: none;">
                           FREE
                         </span>
                       <?php
-                        }
-                        ?>
+                      }
+                      ?>
                     </td>
                     <td style="display:none">
-                      <?php 
+                      <?php
                       if ($price && $price >= 0) {
                         echo $price;
                       } else {
                         echo 0;
-                      } 
+                      }
                       ?>
                     </td>
                     <td <?php echo (in_array('published', $lead_field_display)) ? '' : 'style="display:none"'; ?>>
@@ -264,15 +366,16 @@ class GHAX_Shortcode_Manager
                           </td>
                         <?php
                         } else { ?>
-                          <td><a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a> </td>
+                          <td><a class="leadaddtocart buyleadbtn 1" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a> </td>
                         <?php
                         } ?>
-                      <?php } else { ?>
-                        <td><a class="leadaddtocart buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a> </td>
+                      <?php
+                      } else { ?>
+                        <td><a class="leadaddtocart buyleadbtn 2" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a> </td>
                       <?php
                       }
                     } else { ?>
-                      <td><a class="directbuy buyleadbtn" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a></td>
+                      <td><a class="directbuy buyleadbtn 3" href="javascript:void(0)" data-id="<?php echo esc_attr($result->id); ?>">Get Access</a></td>
                     <?php } ?>
 
                   </tr>
@@ -287,25 +390,43 @@ class GHAX_Shortcode_Manager
           jQuery("a.added").parents("tr").addClass("added");
 
           jQuery(".lead-main-wrap .top-hdr-info ul li").remove();
+        </script>
+        <?php
+        $current_date = current_time('Y-m-d');
+        $user_id = get_current_user_id();
+        $daily_query = $wpdb->prepare(
+          "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
+          $user_id,
+          $current_date
+        );
+        $daily_count = count($wpdb->get_results($daily_query));
 
-          if (jQuery("a.added").length>0){
-            jQuery(".lead-main-wrap").show();
+        $leadcart = get_user_meta($user_id, 'leadcart', true);
+
+        if (!empty($leadcart)) {
+          if ($daily_count == 0) {
+        ?>
+            <script>
+              jQuery(".lead-main-wrap p.request-note").show();
+              jQuery(".lead-main-wrap p.request-note").html("You have access to complimentary leads. Once you have used up your limits, you may be able to purchase new leads based on availability.")
+              jQuery("a.added").each(function(i) {
+                console.log(jQuery(this));
+                jQuery(".lead-main-wrap .top-hdr-info ul").append("<li data-id='" + jQuery(this).attr("data-id") + "'><span class='name'>" + jQuery(this).parents("tr").attr("name") + "</span><span class='price' style='text-decoration: line-through;'>$" + jQuery(this).parents("tr").attr("price") + "</span><span class='free'>FREE</span><svg class='clear-cart' xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='currentColor' d='M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.11 5.7a1 1 0 1 0-1.42 1.42L10.59 12l-4.89 4.88a1 1 0 0 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.42z'/></svg></li>")
+              })
+            </script>
+          <?php
+          } else {
+          ?>
+            <script>
+              jQuery(".lead-main-wrap p.request-note").show();
+              jQuery(".lead-main-wrap p.request-note").html("You are requesting access to this lead.")
+              jQuery("a.added").each(function(i) {
+                jQuery(".lead-main-wrap .top-hdr-info ul").append("<li data-id='" + jQuery(this).attr("data-id") + "'><span class='name'>" + jQuery(this).parents("tr").attr("name") + "</span><span class='price'>$" + jQuery(this).parents("tr").attr("price") + "</span><svg class='clear-cart' xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='currentColor' d='M18.3 5.71a1 1 0 0 0-1.42 0L12 10.59 7.11 5.7a1 1 0 1 0-1.42 1.42L10.59 12l-4.89 4.88a1 1 0 0 0 1.42 1.42L12 13.41l4.88 4.89a1 1 0 0 0 1.42-1.42L13.41 12l4.89-4.88a1 1 0 0 0 0-1.42z'/></svg></li>")
+              })
+            </script>
+        <?php
           }
-          else{
-            jQuery(".lead-main-wrap").hide();
-          }
-          jQuery("a.added").each(function(){
-            jQuery(".lead-main-wrap .top-hdr-info ul").append("<li><span class='name'>" + jQuery(this).parents("tr").attr("name") + "</span><span class='price'>$" + jQuery(this).parents("tr").attr("price") + "<span></li>")
-          })
-        </script>
-        <script>
-          // Call the sorting function after the page has loaded
-          window.onload = function() {
-              // jQuery("#created_on").click();
-              // jQuery("#created_on").click();
-          };
-        </script>
-      <?php
+        }
       } else {
         echo '<p>No leads found.</p>';
       }
@@ -336,7 +457,7 @@ class GHAX_Shortcode_Manager
       //$results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}ghaxlt_leads WHERE `publish`=1  order by id desc");
 
       if (count($results) > 0) {
-      ?>
+        ?>
 
         <div class="leadssrt">
           <h2>Displaying Leads by Category - <?php echo esc_html(ucfirst($r1->name)); ?></h2>
@@ -1224,13 +1345,14 @@ class GHAX_Shortcode_Manager
 
           $daily_query = $wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
-            $user_id, $current_date
+            $user_id,
+            $current_date
           );
           $daily_count = count($wpdb->get_results($daily_query));
 
-          // if ($daily_count == 0){
-          //   $lprice = 0;
-          // }
+          if ($key == 1 && $daily_count == 0) {
+            $lprice = 0;
+          }
 
           $price[] = $lprice;
           $myemail = "";
@@ -1268,7 +1390,7 @@ class GHAX_Shortcode_Manager
       }
 
       echo '<div class="lead-main-wrap"><div class="top-hdr-info"><p style="font-weight:bold;;">You are requesting access to the following leads:</p>';
-      echo "<ul>" . implode($html_li) ."</ul>";
+      echo "<ul>" . implode($html_li) . "</ul>";
 
       $lprice = array_sum($price);
 
@@ -1332,13 +1454,13 @@ class GHAX_Shortcode_Manager
         // Create the payment data for a credit card
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($cardId);
-        $creditCard->setExpirationDate("20".$card_exp_yy."-".$card_exp_mm);
+        $creditCard->setExpirationDate("20" . $card_exp_yy . "-" . $card_exp_mm);
         $creditCard->setCardCode($card_code);
 
         // Add the payment data to a paymentType object
         $paymentOne = new AnetAPI\PaymentType();
         $paymentOne->setCreditCard($creditCard);
-        
+
         // Set the customer's Bill To address
         $customerAddress = new AnetAPI\CustomerAddressType();
         $customerAddress->setFirstName($anet_first_name);
@@ -1349,7 +1471,7 @@ class GHAX_Shortcode_Manager
         $customerData->setEmail($anet_email);
 
         $transactionRequestType = new AnetAPI\TransactionRequestType();
-        $transactionRequestType->setTransactionType("authCaptureTransaction"); 
+        $transactionRequestType->setTransactionType("authCaptureTransaction");
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setPayment($paymentOne);
         $transactionRequestType->setBillTo($customerAddress);
@@ -1662,17 +1784,17 @@ class GHAX_Shortcode_Manager
       }
 
       ?>
-        <div class="price">
-          <span>
-            <?php if ($lprice) {
+      <div class="price">
+        <span>
+          <?php if ($lprice) {
 
-              echo get_option('lead_currency') . $lprice;
-            } else {
+            echo get_option('lead_currency') . $lprice;
+          } else {
 
-              echo get_option('lead_currency') . '0.00';
-            } ?>
-          </span>
-        </div>
+            echo get_option('lead_currency') . '0.00';
+          } ?>
+        </span>
+      </div>
       </div>
       <!-- <div class="payment_options_container" style="<?php echo $display_data; ?>">
         <?php if (($paypal_s) && ($stripe_s)) { ?>
@@ -1785,7 +1907,7 @@ class GHAX_Shortcode_Manager
               <button class="stripebtn">Submit Payment</button>
             </form>
           </div>
-        <?php } 
+        <?php }
         if (get_option('authorize_api_login') && (get_option('authorize_transaction_key'))) { ?>
           <div class="ghax_anet_form" <?php if (($paypal_s) && ($stripe_s)) { ?> style="display:none" <?php } ?>>
 
@@ -1806,10 +1928,10 @@ class GHAX_Shortcode_Manager
                 </div>
                 <h5>Credit card information</h5>
                 <div id="card-element">
-                    <input type="text" name="cardId" id="card-number" placeholder="Card Number" data-attr="cardNumber" pattern="\d*" required>
-                    <input type="text" name="expiry-date-mm" id="expiry-date-mm" placeholder="MM" data-attr="expDate" pattern="\d{2}" maxlength="2" required>
-                    <input type="text" name="expiry-date-yy" id="expiry-date-yy" placeholder="YY" data-attr="expDate" pattern="\d{2}" maxlength="2" required>
-                    <input type="text" name="card-code" id="card-code" placeholder="CVV" data-attr="cardCode" pattern="\d{3}" maxlength="3" required>
+                  <input type="text" name="cardId" id="card-number" placeholder="Card Number" data-attr="cardNumber" pattern="\d*" required>
+                  <input type="text" name="expiry-date-mm" id="expiry-date-mm" placeholder="MM" data-attr="expDate" pattern="\d{2}" maxlength="2" required>
+                  <input type="text" name="expiry-date-yy" id="expiry-date-yy" placeholder="YY" data-attr="expDate" pattern="\d{2}" maxlength="2" required>
+                  <input type="text" name="card-code" id="card-code" placeholder="CVV" data-attr="cardCode" pattern="\d{3}" maxlength="3" required>
                 </div>
 
                 <!-- Used to display Element errors. -->
@@ -1824,7 +1946,7 @@ class GHAX_Shortcode_Manager
               <button class="anetbtn" name="anetbtn">Submit Payment</button>
             </form>
           </div>
-        <?php }?>
+        <?php } ?>
       </div>
       </div>
       <!-- <script src="https://js.stripe.com/v3/"></script>
