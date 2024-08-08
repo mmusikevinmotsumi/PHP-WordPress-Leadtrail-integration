@@ -119,16 +119,19 @@ class GHAX_Shortcode_Manager
         $user_roles = $user_info->roles;
         // echo 'User roles: ' . implode(', ', $user_roles);
         if (strpos(implode(', ', $user_roles), 'ghaxlt_annual_buyer') !== false) {
+          $user_type = 'annual_buyer';
           $daily_limit = get_option('daily_limit_annual');
           $monthly_limit = get_option('monthly_limit_annual');
           $yearly_limit = get_option('yearly_limit_annual');
         }
         if (strpos(implode(', ', $user_roles), 'ghaxlt_monthly_buyer') !== false) {
+          $user_type = 'monthly_buyer';
           $daily_limit = get_option('daily_limit_monthly');
           $monthly_limit = get_option('monthly_limit_monthly');
           $yearly_limit = get_option('yearly_limit_monthly');
         }
         if (strpos(implode(', ', $user_roles), 'administrator') !== false) {
+          $user_type = 'administrator';
           $daily_limit = 9999;
           $monthly_limit = 9999;
           $yearly_limit = 9999;
@@ -170,7 +173,7 @@ class GHAX_Shortcode_Manager
                 <div class="float-end text-end mt-4 mb-4">
                   <div class="form-holder">
                     <div class="cart-btn-top">
-                      <a class="buyleadbtn confirmaddtocart daily-count-<?php echo $daily_count ?>" href="javascript:void(0)">Confirm</a>
+                      <a class="buyleadbtn confirmaddtocart <?php echo $user_type;?> daily-count-<?php echo $daily_count;?> cart-count-<?php echo $leadcart? count($leadcart) : 0; ?>" href="javascript:void(0)">Confirm</a>
                     </div>
                   </div>
                 </div>
@@ -270,6 +273,9 @@ class GHAX_Shortcode_Manager
 
                       $current_date = current_time('Y-m-d');
                       $user_id = get_current_user_id();
+                      $user_info = get_userdata($user_id);
+                      $user_roles = $user_info->roles;
+                      
                       $daily_query = $wpdb->prepare(
                         "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
                         $user_id,
@@ -278,7 +284,7 @@ class GHAX_Shortcode_Manager
                       $daily_count = count($wpdb->get_results($daily_query));
 
                       $leadcart = get_user_meta($user_id, 'leadcart', true);
-                      if (empty($leadcart) && $daily_count == 0) {
+                      if (empty($leadcart) && $daily_count == 0 && strpos(implode(', ', $user_roles), 'ghaxlt_monthly_buyer') === false) {
                       ?>
                         <span class='price' style="text-decoration: line-through;">
                           <?php
@@ -394,6 +400,9 @@ class GHAX_Shortcode_Manager
         <?php
         $current_date = current_time('Y-m-d');
         $user_id = get_current_user_id();
+        $user_info = get_userdata($user_id);
+        $user_roles = $user_info->roles;
+
         $daily_query = $wpdb->prepare(
           "SELECT * FROM {$wpdb->prefix}ghaxlt_leads_payments WHERE `user_id` = %d AND DATE(`created_date`) = %s",
           $user_id,
@@ -404,7 +413,7 @@ class GHAX_Shortcode_Manager
         $leadcart = get_user_meta($user_id, 'leadcart', true);
 
         if (!empty($leadcart)) {
-          if ($daily_count == 0) {
+          if ($daily_count == 0 && strpos(implode(', ', $user_roles), 'ghaxlt_monthly_buyer') === false) {
         ?>
             <script>
               jQuery(".lead-main-wrap p.request-note").show();
@@ -1483,7 +1492,8 @@ class GHAX_Shortcode_Manager
         $request->setTransactionRequest($transactionRequestType);
 
         $controller = new AnetController\CreateTransactionController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        // $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
 
         // if ($charge->status == 'succeeded') {

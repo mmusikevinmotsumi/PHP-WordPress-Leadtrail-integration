@@ -112,76 +112,76 @@ class GHAX_Public_Ajax
 
     if ($leadcart) {
       // echo "Cart count: ".count($leadcart)."\n";
-      echo "You are only allowed to redeem 1 lead at a time";
-      die();
       if (count($leadcart) > 1) {
+        wp_send_json_error('You are only allowed to redeem 1 lead at a time.');
         die();
       } else if (count($leadcart) + $daily_count > $daily_limit + $max_lead_purchase) {
-        echo "Your membership allows access to a total of:\n";
         if ($user_type == 'annual_buyer') {
+          echo "Your membership allows access to a total of:\n";
           echo (int) $daily_limit . " free lead and " . (int) $max_lead_purchase;
-        } else {
-          echo (int) $daily_limit;
-        }
-        echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
-        die();
+          echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+          die();
+        } 
       } else if (count($leadcart) + $monthly_count > $monthly_limit) {
-        echo "Your membership allows access to a total of:\n";
         if ($user_type == 'annual_buyer') {
+          echo "Your membership allows access to a total of:\n";
           echo (int) $daily_limit . " free lead and " . (int) $max_lead_purchase;
-        } else {
-          echo (int) $daily_limit;
+          echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+          die();
         }
-        echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
-        die();
       } else if (count($leadcart) + $yearly_count > $yearly_limit) {
-        echo "Your membership allows access to a total of:\n";
         if ($user_type == 'annual_buyer') {
+          echo "Your membership allows access to a total of:\n";
           echo (int) $daily_limit . " free lead and " . (int) $max_lead_purchase;
-        } else {
-          echo (int) $daily_limit;
+          echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+          die();
         }
-        echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
-        die();
       } else if (count($leadcart) + $daily_total_count > $max_global_purchase) {
         echo "We're sorry, the maximum number of leads have been purchased for the day. Please try again tomorrow.";
         die();
-      } else {
-      }
+      } 
 
       if (in_array((int) $_POST['id'], $leadcart)) {
         $leadcart1 = $leadcart;
       } else {
         $leadcart1 = array_merge($leadcart, $id);
       }
-    } else {
-      // echo "Cart count: 0";
+    } else 
+    {
       if ($daily_count >= $daily_limit + $max_lead_purchase) {
-        echo "Your membership allows access to a total of:\n";
         if ($user_type == 'annual_buyer') {
+          echo "Your membership allows access to a total of:\n";
           echo (int) $daily_limit . " free lead and " . (int) $max_lead_purchase;
-        } else {
-          echo (int) $max_lead_purchase;
+          echo " paid leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+          die();
         }
-        echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+        if ($user_type == 'monthly_buyer') {
+          echo "Your membership allows access to a total of:\n";
+          echo (int) $max_lead_purchase;
+          echo " leads per day\n";
+          die();
+        }
       } else if ($monthly_count >= $monthly_limit) {
-        echo "Your membership allows access to a total of:\n";
         if ($user_type == 'annual_buyer') {
+          echo "Your membership allows access to a total of:\n";
           echo (int) $daily_limit . " free lead and " . (int) $max_lead_purchase;
-        } else {
-          echo (int) $max_lead_purchase;
+          echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+          die();
         }
-        echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
-        die();
+        else{
+          $leadcart1 = $id;
+        }
+
       } else if ($yearly_count >= $yearly_limit) {
-        echo "Your membership allows access to a total of:\n";
         if ($user_type == 'annual_buyer') {
+          echo "Your membership allows access to a total of:\n";
           echo (int) $daily_limit . " free lead and " . (int) $max_lead_purchase;
-        } else {
-          echo (int) $max_lead_purchase;
+          echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
+          die();
         }
-        echo " leads per day\n" . (int) $monthly_limit . " leads per month\n" . (int) $yearly_limit . " leads per year";
-        die();
+        else{
+          $leadcart1 = $id;
+        }
       } else if ($daily_total_count >= $max_global_purchase) {
         echo "We're sorry, the maximum number of leads have been purchased for the day. Please try again tomorrow.";
         die();

@@ -66,39 +66,44 @@ jQuery(document).ready(function ($) {
   $(document).on('click', '.leadaddtocart', function (event) {
     var id = $(this).attr('data-id');
     var $thisbutton = $(this);
+    if ($("#leadstbl").attr("cart-count") == '0'){
+      $.ajax({
+        type: 'post',
+        url: ajax_script.ajaxurl,
+        data: { action: 'lead_add_to_cart', id: id, nc: ajax_script.nc },
+        beforeSend: function (response) {
+          $thisbutton.removeClass('added').addClass('loading');
+          $(".buyleadbtn").css("pointer-events","none");
+          $("#loading-animation").show();
+        },
+        complete: function (response) {
+          $thisbutton.addClass('added').removeClass('loading');
+          $("#loading-animation").hide();
+        },
+        success: function (response) {
+          if (response) {
+            alert(response);
+            $(".buyleadbtn").css("pointer-events", "auto");
+          } else {
+            console.log("leadaddtocart: success");
+            // $(".buyleadbtn").css("pointer-events", "auto");
+            $thisbutton
+              .parent()
+              .html(
+                '<a class="added remove_cart buyleadbtn" href="javascript:void(0)" data-id="' +
+                  id +
+                  '">Remove</a>'
+              );
+            $(this).parents("tr").addClass("added");
+            window.location.href = window.location.href;
+          }
+        },
+      });
+    }
+    else{
+      alert('You are only allowed to redeem 1 lead at a time');
+    }
     
-    $.ajax({
-      type: 'post',
-      url: ajax_script.ajaxurl,
-      data: { action: 'lead_add_to_cart', id: id, nc: ajax_script.nc },
-      beforeSend: function (response) {
-        $thisbutton.removeClass('added').addClass('loading');
-        $(".buyleadbtn").css("pointer-events","none");
-        $("#loading-animation").show();
-      },
-      complete: function (response) {
-        $thisbutton.addClass('added').removeClass('loading');
-        $("#loading-animation").hide();
-      },
-      success: function (response) {
-        if (response) {
-          alert(response);
-          $(".buyleadbtn").css("pointer-events", "auto");
-        } else {
-          console.log("leadaddtocart: success");
-          $(".buyleadbtn").css("pointer-events", "auto");
-          $thisbutton
-            .parent()
-            .html(
-              '<a class="added remove_cart buyleadbtn" href="javascript:void(0)" data-id="' +
-                id +
-                '">Remove</a>'
-            );
-          $(this).parents("tr").addClass("added");
-          window.location.href = window.location.href;
-        }
-      },
-    });
     
     event.preventDefault();
   });
@@ -121,7 +126,7 @@ jQuery(document).ready(function ($) {
       },
       success: function (response) {
         console.log("remove_cart: success");
-        $(".buyleadbtn").css("pointer-events", "auto");
+        // $(".buyleadbtn").css("pointer-events", "auto");
         $thisbutton
           .parent()
           .html(
@@ -141,8 +146,9 @@ jQuery(document).ready(function ($) {
     event.preventDefault();
     console.log("Run JavaScript - confirmaddtocart");
     var $thisbutton = $(this);
-    if ($thisbutton.hasClass("daily-count-0")){
-      if($("a.added").length>0){
+    if ($thisbutton.hasClass("daily-count-0") && !$thisbutton.hasClass("monthly_buyer")){
+      if(!$thisbutton.hasClass("cart-count-0") ){
+        console.log("Cart is not empty.");
         $.ajax({
           type: 'post',
           url: ajax_script.ajaxurl,
@@ -157,7 +163,7 @@ jQuery(document).ready(function ($) {
             $("#loading-animation").hide();
           },
           success: function (response) {
-            $(".buyleadbtn").css("pointer-events", "auto");
+            // $(".buyleadbtn").css("pointer-events", "auto");
             if (response.data.redirect_url) {
               window.location.href = response.data.redirect_url;
             }
