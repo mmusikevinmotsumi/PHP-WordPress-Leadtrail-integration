@@ -95,8 +95,10 @@ jQuery(document).ready(function ($) {
                   '">Remove</a>'
               );
             $(this).parents("tr").addClass("added");
-            window.location.href = window.location.href;
-          }
+            const currentDateTime = new Date();
+            const milliseconds = currentDateTime.getTime();
+            window.location.href = window.location.href+"?"+milliseconds;
+              }
         },
       });
     }
@@ -135,7 +137,9 @@ jQuery(document).ready(function ($) {
               '">Get Access</a> '
           );
         $(this).parents("tr").removeClass("added");
-        window.location.href = window.location.href;
+        const currentDateTime = new Date();
+        const milliseconds = currentDateTime.getTime();
+        window.location.href = window.location.href+"?"+milliseconds;
       },
     });
     
@@ -146,7 +150,7 @@ jQuery(document).ready(function ($) {
     event.preventDefault();
     console.log("Run JavaScript - confirmaddtocart");
     var $thisbutton = $(this);
-    if ($thisbutton.hasClass("daily-count-0") && !$thisbutton.hasClass("monthly_buyer")){
+    if (($thisbutton.hasClass("daily-count-0") && $thisbutton.hasClass("annual_buyer")) || $thisbutton.hasClass("administrator")){
       if(!$thisbutton.hasClass("cart-count-0") ){
         console.log("Cart is not empty.");
         $.ajax({
@@ -165,7 +169,9 @@ jQuery(document).ready(function ($) {
           success: function (response) {
             // $(".buyleadbtn").css("pointer-events", "auto");
             if (response.data.redirect_url) {
-              window.location.href = response.data.redirect_url;
+              const currentDateTime = new Date();
+              const milliseconds = currentDateTime.getTime();
+              window.location.href = response.data.redirect_url+"?"+milliseconds;
             }
           },
           error: function() {
@@ -215,7 +221,9 @@ jQuery(document).ready(function ($) {
         success: function (response) {
           console.log("remove_cart: success: ", id);
           $(".buyleadbtn").css("pointer-events", "auto");
-          window.location.href = window.location.href;
+          const currentDateTime = new Date();
+          const milliseconds = currentDateTime.getTime();
+          window.location.href = window.location.href+"?"+milliseconds;
         },
       });
       

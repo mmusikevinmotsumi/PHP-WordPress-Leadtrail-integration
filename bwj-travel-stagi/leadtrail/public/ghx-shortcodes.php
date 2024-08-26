@@ -284,7 +284,7 @@ class GHAX_Shortcode_Manager
                       $daily_count = count($wpdb->get_results($daily_query));
 
                       $leadcart = get_user_meta($user_id, 'leadcart', true);
-                      if (empty($leadcart) && $daily_count == 0 && strpos(implode(', ', $user_roles), 'ghaxlt_monthly_buyer') === false) {
+                      if ((empty($leadcart) && $daily_count == 0 && strpos(implode(', ', $user_roles), 'ghaxlt_annual_buyer') === true) || strpos(implode(', ', $user_roles), 'administrator') === true) {
                       ?>
                         <span class='price' style="text-decoration: line-through;">
                           <?php

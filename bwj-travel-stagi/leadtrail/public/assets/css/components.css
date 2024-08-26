@@ -209,10 +209,13 @@
   /* float: left; */
   width: 70%;
 }
-.top-hdr-info .price{
+.top-hdr-info li .price{
   width: 70%;
-  text-align: center;
+  text-align: right;
   margin-left: 15px;
+}
+.top-hdr-info .free{
+  margin-left: 5px;
 }
 .top-hdr-info li{
   width: 100%;
